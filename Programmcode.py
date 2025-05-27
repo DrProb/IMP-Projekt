@@ -29,6 +29,11 @@ while running:
                 else:
                     screen = pygame.display.set_mode((800, 600), pygame.RESIZABLE)
                     width, height = 800, 600
+            elif event.key == pygame.K_ESCAPE:
+                fullscreen = not fullscreen
+                if not fullscreen:
+                    screen = pygame.display.set_mode((800, 600), pygame.RESIZABLE)
+                    width, height = 800, 600
     screen.fill((0, 0, 0))
     rect_width = width // 2
     rect_height = height // 2
