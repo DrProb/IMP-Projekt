@@ -6,6 +6,7 @@ pygame.init()
 width = 800
 height = 600
 fullscreen = False
+clock = pygame.time.Clock()
 
 screen = pygame.display.set_mode((800, 600), pygame.RESIZABLE)
 pygame.display.set_caption("Spiel")
@@ -41,6 +42,9 @@ while running:
     rect_y = (height - rect_height) // 2
     pygame.draw.rect(screen, (200, 100, 100), (rect_x, rect_y, rect_width, rect_height))
     pygame.display.flip()
+
+    clock.tick(60)
+    print(clock.get_fps())
 
 pygame.quit()
 sys.exit
