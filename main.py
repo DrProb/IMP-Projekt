@@ -4,17 +4,19 @@ import sys
 pygame.init()
 
 # Screen setup
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 1920, 1080
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Joe the Square vs The Corners of Doom")
 
 clock = pygame.time.Clock()
 
 # Joe setup
-player_color = (255, 255, 255)
+player_color = (255, 255, 0)
 player_size = 50
 player_pos = [WIDTH // 2, HEIGHT // 2]
 player_speed = 5
+
+
 
 # Deadly blocks setup
 enemy_color = (255, 0, 0)
@@ -25,11 +27,19 @@ enemies = [
     pygame.Rect(0, HEIGHT - enemy_size, enemy_size, enemy_size),  # Bottom-left
     pygame.Rect(WIDTH - enemy_size, HEIGHT - enemy_size, enemy_size, enemy_size),  # Bottom-right
 ]
+background = pygame.image.load("MENSCH.jpg")
+bg_width, bg_height = background.get_size()
+
+x = (WIDTH - bg_width) // 2
+y = (HEIGHT - bg_height) // 2
+
 
 # Game loop
 running = True
 while running:
     clock.tick(60)
+
+
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -44,6 +54,8 @@ while running:
         player_pos[1] -= player_speed
     if keys[pygame.K_DOWN]:
         player_pos[1] += player_speed
+    #if keys[pygame.K_ESCAPE]:
+        #background = pygame.image.load(".jpg")        Hier kommt hoffentlich der escape screen
 
     # Keep Joe on screen
     player_pos[0] = max(0, min(WIDTH - player_size, player_pos[0]))
@@ -62,12 +74,20 @@ while running:
     # Draw everything
     screen.fill((0, 0, 0))  # Black background
 
+    
+    screen.blit(background, (x, y))
+
     # Draw enemies
     for enemy in enemies:
         pygame.draw.rect(screen, enemy_color, enemy)
-
+    
     # Draw player
     pygame.draw.rect(screen, player_color, player_rect)
+
+    
+    
+
+    
 
     pygame.display.flip()
 
