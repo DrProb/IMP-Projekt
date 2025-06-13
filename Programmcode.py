@@ -5,8 +5,8 @@ pygame.init()
 
 # Screen setup
 WIDTH, HEIGHT = 1920, 1080
-windowed_size = (1536, 1024)
-screen = pygame.display.set_mode(windowed_size, pygame.RESIZABLE)
+#windowed_size = (1536, 1024)
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Joe the Square vs The Corners of Doom")
 square_positions = []
 
@@ -80,16 +80,6 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        #elif event.type == pygame.VIDEORESIZE:
-            #screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_F11:
-                fullscreen = not fullscreen
-                if fullscreen:
-                    windowed_size = screen.get_size()  # Vorherige Größe merken
-                    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-                else:
-                    screen = pygame.display.set_mode(windowed_size, pygame.RESIZABLE)
     window_size = screen.get_size()
     bg_scaled, bg_pos = get_scaled_background(window_size)
     screen.fill((0, 0, 0))
