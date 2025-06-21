@@ -16,8 +16,16 @@ RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 
-player = {"hp": 100, "fp": 2, "items": {"hp": 2, "fp": 1}, "rect": pygame.Rect(100, 200, 50, 50)}
-enemy = {"hp": 100, "rect": pygame.Rect(490, 200, 50, 50)}
+player = {
+    "hp": 100,
+    "fp": 10,
+    "items": {"hp": 2, "fp": 2},
+    "rect": pygame.Rect(100, 200, 50, 50)
+}
+enemy = {
+    "hp": 500,
+    "rect": pygame.Rect(490, 200, 50, 50)
+}
 
 player_turn = True
 menu_open = False
@@ -25,7 +33,7 @@ menu_type = None
 message = "Right-click to choose action"
 game_over = False
 
-block_mode = False  # NEW: Blocking mechanic state
+block_mode = False
 marker_x = 100
 marker_speed = 6
 block_result = None
@@ -33,15 +41,18 @@ block_result = None
 def normal_attack():
     return random.randint(10, 15)
 
+def heavy_attack():
+    return random.randint(15, 22)
+
 def special_attack():
     #chance = random.randint(1, 5)
     #if chance == 1:
         #enemy['hp'] == enemy['hp']
         #player['fp'] -= 1
         #message = f"You missed!"
-       # return
+        #return
     #else:
-        return random.randint(20, 30)
+        return random.randint(35, 50)
 
 def draw_text(text, x, y):
     screen.blit(font.render(text, True, WHITE), (x, y))
@@ -49,7 +60,7 @@ def draw_text(text, x, y):
 def draw_bars():
     draw_text(f"Player HP: {player['hp']}", 10, 10)
     draw_text(f"FP: {player['fp']}", 10, 40)
-    draw_text(f"Enemy HP: {enemy['hp']}", WIDTH - 150, 10)
+    draw_text(f"Enemy HP: {enemy['hp']}", WIDTH - 200, 10)
 
 def draw_menu(options, selected_index):
     for i, option in enumerate(options):
@@ -58,16 +69,16 @@ def draw_menu(options, selected_index):
         screen.blit(text, (50, 300 + i * 30))
 
 def draw_block_bar():
-    pygame.draw.rect(screen, WHITE, (100, 400, 440, 10))  # Main bar
-    pygame.draw.rect(screen, RED, (310, 395, 20, 20))     # Target zone
-    pygame.draw.rect(screen, GREEN, (marker_x, 395, 10, 20))  # Marker
+    pygame.draw.rect(screen, WHITE, (100, 400, 440, 10))
+    pygame.draw.rect(screen, RED, (310, 395, 20, 20))
+    pygame.draw.rect(screen, GREEN, (marker_x, 395, 10, 20))
 
 def handle_block(dmg):
     global message
-    center = 320  # Center of the red zone
+    center = 320
     distance = abs(marker_x - center)
     if distance < 10:
-        blocked = dmg  # Perfect block
+        blocked = dmg
         message = f"Perfect block! Blocked all {dmg} damage!"
     elif distance < 40:
         blocked = int(dmg * 0.6)
@@ -80,12 +91,10 @@ def handle_block(dmg):
         message = f"Missed block! Took full {dmg} damage."
     return max(dmg - blocked, 0)
 
-# Menu options
-attack_options = ["Normal Attack", "Special Attack"]
+attack_options = ["Normal Attack", "Heavy Attack", "Special Attack"]
 item_options = ["Use HP Item", "Use FP Item"]
 selected_index = 0
 
-# Prepare attack damage for block mechanic
 pending_enemy_damage = 0
 
 running = True
@@ -108,33 +117,43 @@ while running:
 
             if event.type == pygame.KEYDOWN and menu_open:
                 if event.key == pygame.K_UP:
-                    selected_index = (selected_index - 1) % 2
+                    selected_index = (selected_index - 1) % (3 if menu_type == 'attack' else 2)
                 elif event.key == pygame.K_DOWN:
-                    selected_index = (selected_index + 1) % 2
+                    selected_index = (selected_index + 1) % (3 if menu_type == 'attack' else 2)
                 elif event.key == pygame.K_RETURN:
                     if menu_type == 'attack':
-                        if selected_index == 0:
+                        if selected_index == 0:  # Normal
                             dmg = normal_attack()
                             enemy['hp'] -= dmg
                             message = f"Player used Normal Attack for {dmg} damage!"
-                        elif selected_index == 1:
-                            if player['fp'] > 0:
-                                dmg = special_attack()
+                        elif selected_index == 1:  # Heavy
+                            if player['fp'] >= 1:
+                                dmg = heavy_attack()
                                 enemy['hp'] -= dmg
                                 player['fp'] -= 1
+                                message = f"Player used Heavy Attack for {dmg} damage!"
+                            else:
+                                message = "Not enough FP for Heavy Attack!"
+                                continue
+                        elif selected_index == 2:  # Special
+                            if player['fp'] >= 3:
+                                dmg = special_attack()
+                                enemy['hp'] -= dmg
+                                player['fp'] -= 3
                                 message = f"Player used Special Attack for {dmg} damage!"
                             else:
-                                message = "Not enough FP!"
+                                message = "Not enough FP for Special Attack!"
                                 continue
+
                     elif menu_type == 'item':
                         if selected_index == 0 and player['items']['hp'] > 0:
                             player['hp'] += 30
                             player['items']['hp'] -= 1
                             message = "Used HP item! +30 HP"
                         elif selected_index == 1 and player['items']['fp'] > 0:
-                            player['fp'] += 1
+                            player['fp'] += 3
                             player['items']['fp'] -= 1
-                            message = "Used FP item! +1 FP"
+                            message = "Used FP item! +3 FP"
                         else:
                             message = "No item left!"
                             continue
@@ -158,7 +177,6 @@ while running:
                 block_mode = False
                 player_turn = True
 
-    # Draw characters
     pygame.draw.rect(screen, WHITE, player['rect'])
     pygame.draw.rect(screen, RED, enemy['rect'])
 
@@ -174,7 +192,7 @@ while running:
         draw_block_bar()
         marker_x += marker_speed
         if marker_x > 530 or marker_x < 100:
-            marker_speed *= -1  # Bounce back
+            marker_speed *= -1
 
     draw_text(message, 10, HEIGHT - 30)
 
