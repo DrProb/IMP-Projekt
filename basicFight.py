@@ -40,9 +40,19 @@ block_result = None
 
 def normal_attack():
     return random.randint(10, 15)
+attack_image = pygame.image.load("Flame.png").convert_alpha()
+attack_image_active = False
+attack_image_pos = [0, 0]
+attack_image_speed = 12
+pending_attack_damage = 0
 
 def heavy_attack():
     return random.randint(15, 22)
+attack_image1 = pygame.image.load("Blue.png").convert_alpha()
+attack_image_active1 = False
+attack_image_pos1 = [0, 0]
+attack_image_speed1 = 12
+pending_attack_damage1 = 0
 
 def special_attack():
     #chance = random.randint(1, 5)
@@ -123,11 +133,21 @@ while running:
                 elif event.key == pygame.K_RETURN:
                     if menu_type == 'attack':
                         if selected_index == 0:  # Normal
+                            pending_attack_damage = normal_attack()
+                            # Start the image from just beside the player
+                            attack_image_pos = [player['rect'].right, player['rect'].centery]
+                            attack_image_active = True
+                            menu_open = False
                             dmg = normal_attack()
                             enemy['hp'] -= dmg
                             message = f"Player used Normal Attack for {dmg} damage!"
                         elif selected_index == 1:  # Heavy
                             if player['fp'] >= 1:
+                                pending_attack_damage1 = heavy_attack()
+                                # Start the image from just beside the player
+                                attack_image_pos1 = [player['rect'].right, player['rect'].centery]
+                                attack_image_active1 = True
+                                menu_open = False
                                 dmg = heavy_attack()
                                 enemy['hp'] -= dmg
                                 player['fp'] -= 1
@@ -195,6 +215,56 @@ while running:
             marker_speed *= -1
 
     draw_text(message, 10, HEIGHT - 30)
+
+    if attack_image_active:
+    # Target is the center of the enemy
+        target_x, target_y = enemy['rect'].center
+
+        dx = target_x - attack_image_pos[0]
+        dy = target_y - attack_image_pos[1]
+        distance = (dx**2 + dy**2)**0.5
+
+        if distance < attack_image_speed:
+            # Damage applied on arrival
+            enemy['hp'] -= pending_attack_damage
+            attack_image_active = False
+            pending_attack_damage = 0
+            player_turn = False
+            pygame.time.set_timer(pygame.USEREVENT, 1000)
+            message = f"Normal Attack hit for {enemy['hp']} damage!"
+        else:
+            # Move image toward the enemy
+            attack_image_pos[0] += attack_image_speed * dx / distance
+            attack_image_pos[1] += attack_image_speed * dy / distance
+
+        # Draw the attack image
+        attack_rect = attack_image.get_rect(center=(int(attack_image_pos[0]), int(attack_image_pos[1])))
+        screen.blit(attack_image, attack_rect)
+
+    if attack_image_active1:
+        # Target is the center of the enemy
+        target_x1, target_y1 = enemy['rect'].center
+
+        dx1 = target_x1 - attack_image_pos1[0]
+        dy1 = target_y1 - attack_image_pos1[1]
+        distance1 = (dx1**2 + dy1**2)**0.5
+
+        if distance1 < attack_image_speed1:
+            # Damage applied on arrival
+            enemy['hp'] -= pending_attack_damage1
+            attack_image_active1 = False
+            pending_attack_damage1 = 0
+            player_turn = False
+            pygame.time.set_timer(pygame.USEREVENT, 1000)
+            message = f"Normal Attack hit for {enemy['hp']} damage!"
+        else:
+            # Move image toward the enemy
+            attack_image_pos1[0] += attack_image_speed1 * dx1 / distance1
+            attack_image_pos1[1] += attack_image_speed1 * dy1 / distance1
+
+        # Draw the attack image
+        attack_rect = attack_image.get_rect(center=(int(attack_image_pos1[0]), int(attack_image_pos1[1])))
+        screen.blit(attack_image1, attack_rect)
 
     if player['hp'] <= 0:
         message = "You lost!"
