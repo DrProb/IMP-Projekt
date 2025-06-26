@@ -3,10 +3,13 @@ import sys
 import random
 
 pygame.init()
+pygame.mixer.init()
 
 WIDTH, HEIGHT = 640, 480
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Turn-Based Combat")
+pygame.mixer.music.load('BreakingAllIllusions8Bit.mp3')
+pygame.mixer.music.play(loops=-1)
 
 font = pygame.font.SysFont(None, 30)
 clock = pygame.time.Clock()
