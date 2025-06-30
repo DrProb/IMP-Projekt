@@ -1,14 +1,19 @@
 import pygame
 import sys
+import random
 
 pygame.init()
 
 # Screen setup
 WIDTH, HEIGHT = 1920, 1080
-#windowed_size = (1536, 1024)
+font = pygame.font.Font(None, 144)
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Joe the Square vs The Corners of Doom")
 square_positions = []
+startingPlayer = 0
+currentPlayerIdx = 0
+currentPlayerIdx = startingPlayer
+colors = ["yellow", "green", "blue", "red"]
 square = [
 (815, 860),
 (815, 785),
@@ -46,35 +51,35 @@ square = [
 (975, 780),
 (975, 860),
 (895, 860),
-(625, 835),
-(620, 750),
-(540, 750),
-(540, 835),
+(624, 835),
+(623, 755),
+(543, 755),
+(543, 835),
 (625, 215),
-(540, 215),
+(544, 215),
 (625, 135),
-(540, 135),
-(1150, 215),
-(1150, 135),
-(1230, 135),
-(1230, 215),
+(544, 135),
+(1154, 217),
+(1154, 135),
+(1234, 135),
+(1234, 217),
 (1155, 755),
 (1155, 835),
 (1235, 755),
 (1235, 835),
-(895, 785),
+(895, 785), #gelb
 (895, 725),
 (895, 660),
 (895, 600),
-(610, 490),
+(610, 490),#grün
 (670, 490),
 (730, 490),
 (790, 490),
-(895, 200),
+(895, 200), #blau
 (895, 260),
 (895, 325),
 (895, 385),
-(1175, 490),
+(1175, 490),#rot
 (1110, 490),
 (1050, 490),
 (995, 490)
@@ -82,14 +87,80 @@ square = [
 
 clock = pygame.time.Clock()
 
-# Joe setup
-player_image = pygame.image.load("pictures/blue.png").convert_alpha()
-player_size = 65
-player_image = pygame.transform.scale(player_image, (player_size, player_size))
-player_pos = [WIDTH // 2, HEIGHT // 2]
-player_speed = 5
+class Player:
+    def __init__(self, colorIdx):
+        self.colorIdx = colorIdx
+        self.pieces = []
+        self.piecesPos = [None] * 4
+        self.colorSquare = []
+        self.homeSquares = []
+        for i in range(4):
+            self.homeSquares.append(square[36+i+4*self.colorIdx])
+        for i in range(9*colorIdx, 36):
+            self.colorSquare.append(square[i])
+        for i in range(0, 9*colorIdx):
+            self.colorSquare.append(square[i])
+        for i in range(4):
+            self.colorSquare.append(square[52+i+4*self.colorIdx])
+        self.setup()
 
-background = pygame.image.load("pictures/ludoBackground.png")
+    def setup(self):
+        for i in range(4):
+            piece = Piece(self.colorIdx, i)
+            piece.draw(self.homeSquares[i])
+            self.pieces.append(piece)
+
+    def moveable(self, pos, dice, piece):
+        moveable = True
+        if piece.atHome:
+            if dice != 6:
+                moveable = False
+            else:
+                if 0 in self.piecesPos:
+                    moveable = False
+        else:
+            if pos+dice >= len(self.colorSquare):
+                moveable = False
+            if pos+dice in self.piecesPos:
+                moveable = False
+        piece.moveable = moveable
+        return moveable
+    
+    def movePossible(self, dice):
+        movePossible = False
+        for piece in self.pieces:
+            if self.moveable(piece.currentSquare, dice, piece):
+                movePossible = True
+        #print(f"{colors[self.colorIdx]} kann ziehen: {movePossible}")
+        return movePossible
+
+class Piece:
+    def __init__(self, colorIdx, pieceIdx):           
+        self.idx = pieceIdx
+        self.colorIdx = colorIdx
+        self.currentSquare = None
+        self.color = colors[colorIdx]
+        self.atHome = True
+        self.onBoard = False
+        self.rotation = 0
+        self.player_image = pygame.image.load(f"pictures/{self.color}.png").convert_alpha()
+        self.size = 65
+        self.player_image = pygame.transform.scale(self.player_image, (self.size, self.size))
+        self.moveable = False
+
+    def draw(self, pos):
+        if self.moveable:
+            self.rotation = (self.rotation + 5) % 360
+            rotated_image = pygame.transform.rotate(self.player_image, self.rotation)
+            rect = rotated_image.get_rect(center=(pos[0] + self.size // 2, pos[1] + self.size // 2))
+            screen.blit(rotated_image, rect.topleft)
+        else:
+            #self.rotation_angle = 0  
+            screen.blit(self.player_image, pos)
+
+players = [Player(2*i) for i in range(2)]
+
+background = pygame.image.load("pictures/ludoBackground3.png")
 bg_width, bg_height = background.get_size()
 
 x = (WIDTH - bg_width) // 2
@@ -103,41 +174,96 @@ def get_scaled_background(window_size):
     scaled_bg = pygame.transform.smoothscale(background, (new_width, new_height))
     return scaled_bg, (w // 2 - new_width // 2, 0)
 
+def prepareMove(currentPlayerIdxGiven):
+    global moveComplete, dice, currentPlayerIdx
+    #currentPlayerIdx = currentPlayerIdx
+    moveComplete = False
+    dice = random.randint(1,6)
+    current_player = players[currentPlayerIdxGiven]
+    if not current_player.movePossible(dice):
+        moveComplete = True
+        #print(f"idx vor Switch: {currentPlayerIdx}, also {colors[current_player.colorIdx]}")
+        if dice != 6:
+            currentPlayerIdx = (currentPlayerIdxGiven + 1) % 2
+        #print(f"Switched Player to {colors[current_player.colorIdx]}")
+    return dice    
 
+def getPiecePositions(player):
+    currentPos = []
+    for myPiece in player.pieces:
+        if myPiece.atHome:
+            currentPos.append(player.homeSquares[myPiece.idx])
+        else:
+            currentPos.append(player.colorSquare(myPiece.currentSquare))
+    return currentPos
 
-
-#with open ("square position.txt", "w") as datei:
-    #datei.write("square[\n")
 # Game loop
 running = True
 fullscreen = False
+moveComplete = True
+dice = 0
+
 while running:
     clock.tick(60)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        #if event.type == pygame.KEYDOWN:
-            #if event.key == pygame.K_RETURN:
-                #with open ("square position.txt", "a") as datei:
-                    #datei.write(f"({player_pos[0]}, {player_pos[1]})\n")
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE and moveComplete:
+                dice = prepareMove(currentPlayerIdx)
+        if event.type == pygame.MOUSEBUTTONDOWN and not moveComplete:
+            mouse_pos = pygame.mouse.get_pos()
+            if not moveComplete:
+                current_player = players[currentPlayerIdx]
+                for piece in current_player.pieces:
+                    if piece.atHome: 
+                        piece_rect = pygame.Rect(current_player.homeSquares[piece.idx][0], current_player.homeSquares[piece.idx][1], piece.size, piece.size)
+                    else:
+                        piece_rect = pygame.Rect(current_player.colorSquare[piece.currentSquare][0], current_player.colorSquare[piece.currentSquare][1], piece.size, piece.size)
+                    if piece_rect.collidepoint(mouse_pos) and current_player.moveable(piece.currentSquare, dice, piece):
+                        if piece.atHome:
+                            piece.currentSquare = 0
+                            piece.atHome = False                         
+                        else:
+                            piece.currentSquare += dice        
+                        current_player.piecesPos[piece.idx] = piece.currentSquare   
+                        newPos = current_player.colorSquare[piece.currentSquare]
+                        opp = players[(currentPlayerIdx+1)%2]
+                        #oppPiecePos = getPiecePositions(opp)
+                        for oppPiece in opp.pieces:
+                            if oppPiece.atHome:
+                                continue
+                            else:
+                                if opp.colorSquare[oppPiece.currentSquare] == newPos:
+                                    oppPiece.draw(opp.homeSquares[oppPiece.idx])
+                                    oppPiece.atHome = True
+                                    oppPiece.currentSquare = None
+                                    opp.piecesPos[oppPiece.idx] = None
+                                    break
+                        if dice != 6:
+                            currentPlayerIdx = (currentPlayerIdx + 1) % 2
+                            #print(f"Switched Player to {piece.color}")
+                        moveComplete = True
+                        break  
+                for piece in current_player.pieces:
+                    piece.moveable = False
     window_size = screen.get_size()
     bg_scaled, bg_pos = get_scaled_background(window_size)
     screen.fill((0, 0, 0))
     screen.blit(bg_scaled, bg_pos)
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
-        player_pos[0] -= player_speed
-    if keys[pygame.K_RIGHT]:
-        player_pos[0] += player_speed
-    if keys[pygame.K_UP]:
-        player_pos[1] -= player_speed
-    if keys[pygame.K_DOWN]:
-        player_pos[1] += player_speed
-    player_pos[0] = max(0, min(window_size[0] - player_size, player_pos[0]))
-    player_pos[1] = max(0, min(window_size[1] - player_size, player_pos[1]))
-    for i in range(68):
-        screen.blit(player_image, square[i])
+    #if keys[pygame.K_LEFT]:
+        #player_pos[0] -= player_speed
+    #player_pos[0] = max(0, min(window_size[0] - player_size, player_pos[0]))
+    #player_pos[1] = max(0, min(window_size[1] - player_size, player_pos[1]))
+    for player in players:
+        for piece in player.pieces:
+            if piece.atHome:
+                piece.draw(player.homeSquares[piece.idx])
+            else:
+                piece.draw(player.colorSquare[piece.currentSquare])
+    text_surface = font.render(f"{dice}", True, (255, 255, 255))
+    screen.blit(text_surface, (WIDTH//2-60, HEIGHT//2-60))
     pygame.display.flip()
-    print(player_pos)
 pygame.quit()
 sys.exit()
