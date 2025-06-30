@@ -48,7 +48,7 @@ pending_attack_damage = 0
 
 def heavy_attack():
     return random.randint(15, 22)
-attack_image1 = pygame.image.load("Blue.png").convert_alpha()
+attack_image1 = pygame.image.load("Blue Flame.png").convert_alpha()
 attack_image_active1 = False
 attack_image_pos1 = [0, 0]
 attack_image_speed1 = 12
@@ -190,7 +190,7 @@ while running:
             block_mode = True
             marker_x = 100
 
-        elif block_mode and event.type == pygame.KEYDOWN:
+        elif block_mode and event.type == pygame.KEYDOWN and enemy['hp'] >= 1:
             if event.key == pygame.K_SPACE:
                 final_dmg = handle_block(pending_enemy_damage)
                 player['hp'] -= final_dmg
@@ -208,7 +208,7 @@ while running:
         elif menu_type == 'item':
             draw_menu(item_options, selected_index)
 
-    if block_mode:
+    if block_mode and enemy['hp'] >= 1:
         draw_block_bar()
         marker_x += marker_speed
         if marker_x > 530 or marker_x < 100:
@@ -243,10 +243,10 @@ while running:
 
     if attack_image_active1:
         # Target is the center of the enemy
-        target_x1, target_y1 = enemy['rect'].center
+        target_x1, target_y1 = enemy['rect'].center 
 
-        dx1 = target_x1 - attack_image_pos1[0]
-        dy1 = target_y1 - attack_image_pos1[1]
+        dx1 = target_x1 - attack_image_pos1[0] - 40
+        dy1 = target_y1 - attack_image_pos1[1] - 10
         distance1 = (dx1**2 + dy1**2)**0.5
 
         if distance1 < attack_image_speed1:
