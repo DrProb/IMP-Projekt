@@ -175,16 +175,24 @@ def get_scaled_background(window_size):
     return scaled_bg, (w // 2 - new_width // 2, 0)
 
 def prepareMove(currentPlayerIdxGiven):
-    global moveComplete, dice, currentPlayerIdx
+    global moveComplete, dice, currentPlayerIdx, movesInARow
+    movesInARow += 1
     #currentPlayerIdx = currentPlayerIdx
     moveComplete = False
     dice = random.randint(1,6)
     current_player = players[currentPlayerIdxGiven]
+    print(f"{colors[current_player.colorIdx]} at turn. {movesInARow} Moves in a Row. Pieces at: {current_player.piecesPos}")
     if not current_player.movePossible(dice):
         moveComplete = True
+        
         #print(f"idx vor Switch: {currentPlayerIdx}, also {colors[current_player.colorIdx]}")
         if dice != 6:
             currentPlayerIdx = (currentPlayerIdxGiven + 1) % 2
+        if current_player.piecesPos == [None, None, None, None]: #and movesInARow < 3:
+            currentPlayerIdx = (currentPlayerIdx+1) % 2
+        if movesInARow > 3:
+            currentPlayerIdx = (currentPlayerIdx+1) % 2
+            movesInARow = 0
         #print(f"Switched Player to {colors[current_player.colorIdx]}")
     return dice    
 
@@ -202,7 +210,7 @@ running = True
 fullscreen = False
 moveComplete = True
 dice = 0
-
+movesInARow = 0
 while running:
     clock.tick(60)
     for event in pygame.event.get():
@@ -221,6 +229,7 @@ while running:
                     else:
                         piece_rect = pygame.Rect(current_player.colorSquare[piece.currentSquare][0], current_player.colorSquare[piece.currentSquare][1], piece.size, piece.size)
                     if piece_rect.collidepoint(mouse_pos) and current_player.moveable(piece.currentSquare, dice, piece):
+                        
                         if piece.atHome:
                             piece.currentSquare = 0
                             piece.atHome = False                         
@@ -240,13 +249,18 @@ while running:
                                     oppPiece.currentSquare = None
                                     opp.piecesPos[oppPiece.idx] = None
                                     break
-                        if dice != 6:
+                        if dice != 6: #and not (current_player.piecesPos == [None, None, None, None] and movesInARow > 3):
                             currentPlayerIdx = (currentPlayerIdx + 1) % 2
+                            movesInARow = 0
                             #print(f"Switched Player to {piece.color}")
+                        #print(f"piecesPos = {current_player.piecesPos}, movesInARow = {movesInARow}")
+                        
                         moveComplete = True
                         break  
-                for piece in current_player.pieces:
-                    piece.moveable = False
+                    #print(f"{piece.color} ist am Zug: {moveComplete}")
+                if moveComplete:
+                    for piece in current_player.pieces:
+                        piece.moveable = False
     window_size = screen.get_size()
     bg_scaled, bg_pos = get_scaled_background(window_size)
     screen.fill((0, 0, 0))
