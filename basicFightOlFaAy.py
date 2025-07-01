@@ -1,4 +1,3 @@
-
 import pygame
 import sys
 import random
@@ -23,11 +22,11 @@ GREEN = (0, 255, 0)
 player = {
     "hp": 100,
     "fp": 10,
-    "items": {"hp": 2, "fp": 2},
+    "items": {"hp": 10, "fp": 2},
     "rect": pygame.Rect(100, 200, 50, 50)
 }
 enemy = {
-    "hp": 400,
+    "hp": 300,
     "rect": pygame.Rect(490, 200, 50, 50)
 }
 
@@ -49,14 +48,7 @@ def heavy_attack():
     return random.randint(15, 22)
 
 def special_attack():
-    #chance = random.randint(1, 5)
-    #if chance == 1:
-        #enemy['hp'] == enemy['hp']
-        #player['fp'] -= 1
-        #message = f"You missed!"
-        #return
-    #else:
-        return random.randint(35, 50)
+    return random.randint(35, 50)
 
 def draw_text(text, x, y):
     screen.blit(font.render(text, True, WHITE), (x, y))
@@ -125,29 +117,36 @@ while running:
                 elif event.key == pygame.K_DOWN:
                     selected_index = (selected_index + 1) % (3 if menu_type == 'attack' else 2)
                 elif event.key == pygame.K_RETURN:
+                    damage_dealt = 0
                     if menu_type == 'attack':
-                        if selected_index == 0:  # Normal
-                            dmg = normal_attack()
-                            enemy['hp'] -= dmg
-                            message = f"Player used Normal Attack for {dmg} damage!"
-                        elif selected_index == 1:  # Heavy
+                        if selected_index == 0:
+                            damage_dealt = normal_attack()
+                            enemy['hp'] -= damage_dealt
+                            message = f"Player used Normal Attack for {damage_dealt} damage!"
+                        elif selected_index == 1:
                             if player['fp'] >= 1:
-                                dmg = heavy_attack()
-                                enemy['hp'] -= dmg
+                                damage_dealt = heavy_attack()
+                                enemy['hp'] -= damage_dealt
                                 player['fp'] -= 1
-                                message = f"Player used Heavy Attack for {dmg} damage!"
+                                message = f"Player used Heavy Attack for {damage_dealt} damage!"
                             else:
                                 message = "Not enough FP for Heavy Attack!"
                                 continue
-                        elif selected_index == 2:  # Special
+                        elif selected_index == 2:
                             if player['fp'] >= 3:
-                                dmg = special_attack()
-                                enemy['hp'] -= dmg
+                                damage_dealt = special_attack()
+                                enemy['hp'] -= damage_dealt
                                 player['fp'] -= 3
-                                message = f"Player used Special Attack for {dmg} damage!"
+                                message = f"Player used Special Attack for {damage_dealt} damage!"
                             else:
                                 message = "Not enough FP for Special Attack!"
                                 continue
+
+                        # 50% chance of self-damage
+                        if damage_dealt > 0 and random.random() < 0.5:
+                            self_damage = int(damage_dealt * random.uniform(0.3, 0.7))
+                            player['hp'] -= self_damage
+                            message = random.choice(["Oleg meine Eier", "Fassan meine Eier", "Ayale gen"])
 
                     elif menu_type == 'item':
                         if selected_index == 0 and player['items']['hp'] > 0:
