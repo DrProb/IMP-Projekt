@@ -1,47 +1,64 @@
-
 import pygame
 import sys
 import random
+import time
 
 pygame.init()
 pygame.mixer.init()
 
+# --- Game Setup ---
 WIDTH, HEIGHT = 640, 480
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Turn-Based Combat")
+
+# Background Music
 pygame.mixer.music.load('TakeTheTime8Bit.mp3')
 pygame.mixer.music.play(loops=-1)
 
+# Loud Sound Setup 
+loud_sound = pygame.mixer.Sound('Georgsyndrom.mp3')
+next_loud_sound_time = pygame.time.get_ticks() + random.randint(15000, 25000)
+
+# Font and Clock
 font = pygame.font.SysFont(None, 30)
 clock = pygame.time.Clock()
 
+# Colors
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 
+# Game State
 player = {
     "hp": 100,
     "fp": 10,
-    "items": {"hp": 2, "fp": 2},
+    "items": {"hp": 10, "fp": 2},
     "rect": pygame.Rect(100, 200, 50, 50)
 }
 enemy = {
-    "hp": 400,
+    "hp": 600,
     "rect": pygame.Rect(490, 200, 50, 50)
 }
 
 player_turn = True
 menu_open = False
 menu_type = None
-message = "Du wurdest von Linus Torvalds angegriffen"
+message = "Du wurdest von Oleg, Fassan und Ayale angegriffen"
 game_over = False
 
 block_mode = False
 marker_x = 100
 marker_speed = 6
-block_result = None
 
+attack_options = ["Normal Attack", "Heavy Attack", "Special Attack"]
+item_options = ["Use HP Item", "Use FP Item"]
+selected_index = 0
+
+pending_enemy_damage = 0
+
+
+# --- Utility Functions ---
 def normal_attack():
     return random.randint(10, 15)
 
@@ -49,14 +66,7 @@ def heavy_attack():
     return random.randint(15, 22)
 
 def special_attack():
-    #chance = random.randint(1, 5)
-    #if chance == 1:
-        #enemy['hp'] == enemy['hp']
-        #player['fp'] -= 1
-        #message = f"You missed!"
-        #return
-    #else:
-        return random.randint(35, 50)
+    return random.randint(35, 50)
 
 def draw_text(text, x, y):
     screen.blit(font.render(text, True, WHITE), (x, y))
@@ -95,19 +105,24 @@ def handle_block(dmg):
         message = f"Missed block! Took full {dmg} damage."
     return max(dmg - blocked, 0)
 
-attack_options = ["Normal Attack", "Heavy Attack", "Special Attack"]
-item_options = ["Use HP Item", "Use FP Item"]
-selected_index = 0
-
-pending_enemy_damage = 0
-
+# --- Main Game Loop ---
 running = True
 while running:
     screen.fill(BLACK)
 
+    now = pygame.time.get_ticks()
+    if now >= next_loud_sound_time:
+        loud_sound.play()
+        next_loud_sound_time = now + random.randint(15000, 25000)
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+        if not block_mode and event.type == pygame.KEYDOWN:
+            if random.random() < 0.25:
+                player['hp'] -= 2
+                message = "Du leidest an Friedrich Schmerzen"
 
         if not game_over and player_turn and not block_mode:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
@@ -126,11 +141,18 @@ while running:
                     selected_index = (selected_index + 1) % (3 if menu_type == 'attack' else 2)
                 elif event.key == pygame.K_RETURN:
                     if menu_type == 'attack':
-                        if selected_index == 0:  # Normal
+                        if random.random() < 0.5:
+                            message = "Angriff wurde verweigert"
+                            menu_open = False
+                            player_turn = False
+                            pygame.time.set_timer(pygame.USEREVENT, 1000)
+                            continue
+
+                        if selected_index == 0:
                             dmg = normal_attack()
                             enemy['hp'] -= dmg
                             message = f"Player used Normal Attack for {dmg} damage!"
-                        elif selected_index == 1:  # Heavy
+                        elif selected_index == 1:
                             if player['fp'] >= 1:
                                 dmg = heavy_attack()
                                 enemy['hp'] -= dmg
@@ -139,7 +161,7 @@ while running:
                             else:
                                 message = "Not enough FP for Heavy Attack!"
                                 continue
-                        elif selected_index == 2:  # Special
+                        elif selected_index == 2:
                             if player['fp'] >= 3:
                                 dmg = special_attack()
                                 enemy['hp'] -= dmg
@@ -148,6 +170,12 @@ while running:
                             else:
                                 message = "Not enough FP for Special Attack!"
                                 continue
+
+                        # Backfire chance
+                        if random.random() < 0.5:
+                            backfire = int(dmg * random.uniform(0.3, 0.7))
+                            player['hp'] -= backfire
+                            message = random.choice(["Oleg meine Eier", "Fassan meine Eier", "Ayale gen"])
 
                     elif menu_type == 'item':
                         if selected_index == 0 and player['items']['hp'] > 0:
