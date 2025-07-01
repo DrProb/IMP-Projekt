@@ -34,7 +34,7 @@ enemy = {
 player_turn = True
 menu_open = False
 menu_type = None
-message = "Right-click to choose action"
+message = "Du wurdest von Oleg, Fassan und Ayale angegriffen"
 game_over = False
 
 block_mode = False

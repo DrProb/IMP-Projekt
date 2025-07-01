@@ -1,46 +1,60 @@
-
 import pygame
 import sys
 import random
 
+# Initialize Pygame and its mixer
 pygame.init()
 pygame.mixer.init()
 
+# Set up the display
 WIDTH, HEIGHT = 640, 480
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Turn-Based Combat")
+
+# Background music
 pygame.mixer.music.load('RUMine8Bit.mp3')
 pygame.mixer.music.play(loops=-1)
 
+# Load loud sound (replace filename as needed)
+loud_sound = pygame.mixer.Sound('Georgsyndrom.mp3')  # spielt metal pipe falling sound
+
+# Font and timing
 font = pygame.font.SysFont(None, 30)
 clock = pygame.time.Clock()
 
+# Colors
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 
+# Game entities
 player = {
     "hp": 100,
     "fp": 10,
     "items": {"hp": 2, "fp": 2},
     "rect": pygame.Rect(100, 200, 50, 50)
 }
+
 enemy = {
     "hp": 400,
     "rect": pygame.Rect(490, 200, 50, 50)
 }
 
+# Game state
 player_turn = True
 menu_open = False
 menu_type = None
-message = "Right-click to choose action"
+message = "Du wurdest von Georgbär angegriffen"
 game_over = False
-
 block_mode = False
+
+# Block mechanic
 marker_x = 100
 marker_speed = 6
-block_result = None
+
+# Timing for loud sound
+next_loud_sound_time = pygame.time.get_ticks() + random.randint(15000, 25000)
 
 def normal_attack():
     return random.randint(10, 15)
@@ -49,14 +63,7 @@ def heavy_attack():
     return random.randint(15, 22)
 
 def special_attack():
-    #chance = random.randint(1, 5)
-    #if chance == 1:
-        #enemy['hp'] == enemy['hp']
-        #player['fp'] -= 1
-        #message = f"You missed!"
-        #return
-    #else:
-        return random.randint(35, 50)
+    return random.randint(35, 50)
 
 def draw_text(text, x, y):
     screen.blit(font.render(text, True, WHITE), (x, y))
@@ -181,9 +188,11 @@ while running:
                 block_mode = False
                 player_turn = True
 
+    # Draw characters
     pygame.draw.rect(screen, WHITE, player['rect'])
     pygame.draw.rect(screen, RED, enemy['rect'])
 
+    # UI
     draw_bars()
 
     if menu_open and not block_mode:
@@ -206,6 +215,12 @@ while running:
     elif enemy['hp'] <= 0:
         message = "You won!"
         game_over = True
+
+    # Play loud sound at randomized intervals
+    current_time = pygame.time.get_ticks()
+    if current_time >= next_loud_sound_time:
+        loud_sound.play()
+        next_loud_sound_time = current_time + random.randint(15000, 25000)  # 15–25 seconds
 
     pygame.display.flip()
     clock.tick(60)

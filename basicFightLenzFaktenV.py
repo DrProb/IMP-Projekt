@@ -33,7 +33,7 @@ player = {
     "rect": pygame.Rect(100, 200, 50, 50)
 }
 enemy = {
-    "hp": 400,
+    "hp": 300,
     "rect": pygame.Rect(490, 200, 50, 50)
 }
 
