@@ -88,12 +88,13 @@ square = [
 clock = pygame.time.Clock()
 
 class Player:
-    def __init__(self, colorIdx):
+    def __init__(self, colorIdx, isBot):
         self.colorIdx = colorIdx
         self.pieces = []
         self.piecesPos = [None] * 4
         self.colorSquare = []
         self.homeSquares = []
+        self.bot = isBot
         for i in range(4):
             self.homeSquares.append(square[36+i+4*self.colorIdx])
         for i in range(9*colorIdx, 36):
@@ -133,6 +134,25 @@ class Player:
                 movePossible = True
         #print(f"{colors[self.colorIdx]} kann ziehen: {movePossible}")
         return movePossible
+    
+    def canBeat(self, opp, dice, pos):
+        canBeat = False
+        if pos == None:
+            newPos = 0
+        else:
+            newPos = pos+dice
+        oppPiecesCrd = []
+        for piece in opp.pieces:
+            if piece.atHome:
+                oppPiecesCrd.append(None)
+            else:
+                oppPiecesCrd.append(opp.colorSquare[piece.currentSquare])
+        if self.colorSquare[newPos] in oppPiecesCrd:
+            canBeat = True
+        return canBeat
+        
+
+
 
 class Piece:
     def __init__(self, colorIdx, pieceIdx):           
@@ -158,7 +178,9 @@ class Piece:
             #self.rotation_angle = 0  
             screen.blit(self.player_image, pos)
 
-players = [Player(2*i) for i in range(2)]
+players = [] #Player(2*i) for i in range(2)
+players.append(Player(0, False))
+players.append(Player(2, True))
 
 background = pygame.image.load("pictures/ludoBackground3.png")
 bg_width, bg_height = background.get_size()
@@ -175,13 +197,13 @@ def get_scaled_background(window_size):
     return scaled_bg, (w // 2 - new_width // 2, 0)
 
 def prepareMove(currentPlayerIdxGiven):
-    global moveComplete, dice, currentPlayerIdx, movesInARow
+    global moveComplete, dice, currentPlayerIdx, movesInARow, current_player
     movesInARow += 1
     #currentPlayerIdx = currentPlayerIdx
     moveComplete = False
     dice = random.randint(1,6)
     current_player = players[currentPlayerIdxGiven]
-    print(f"{colors[current_player.colorIdx]} at turn. {movesInARow} Moves in a Row. Pieces at: {current_player.piecesPos}")
+    #print(f"{colors[current_player.colorIdx]} at turn. {movesInARow} Moves in a Row. Pieces at: {current_player.piecesPos}")
     if not current_player.movePossible(dice):
         moveComplete = True
         
@@ -190,7 +212,7 @@ def prepareMove(currentPlayerIdxGiven):
             currentPlayerIdx = (currentPlayerIdxGiven + 1) % 2
         if current_player.piecesPos == [None, None, None, None]: #and movesInARow < 3:
             currentPlayerIdx = (currentPlayerIdx+1) % 2
-        if movesInARow > 3:
+        if movesInARow >= 3:
             currentPlayerIdx = (currentPlayerIdx+1) % 2
             movesInARow = 0
         #print(f"Switched Player to {colors[current_player.colorIdx]}")
@@ -205,21 +227,50 @@ def getPiecePositions(player):
             currentPos.append(player.colorSquare(myPiece.currentSquare))
     return currentPos
 
+def move(piece):
+    global movesInARow, moveComplete, current_player, currentPlayerIdx
+    if piece.atHome:
+        piece.currentSquare = 0
+        piece.atHome = False                         
+    else:
+        piece.currentSquare += dice        
+    current_player.piecesPos[piece.idx] = piece.currentSquare   
+    newPos = current_player.colorSquare[piece.currentSquare]
+    opp = players[(currentPlayerIdx+1)%2]
+    #oppPiecePos = getPiecePositions(opp)
+    for oppPiece in opp.pieces:
+        if oppPiece.atHome:
+            continue
+        else:
+            if opp.colorSquare[oppPiece.currentSquare] == newPos:
+                oppPiece.draw(opp.homeSquares[oppPiece.idx])
+                oppPiece.atHome = True
+                oppPiece.currentSquare = None
+                opp.piecesPos[oppPiece.idx] = None
+                break
+    if dice != 6: #and not (current_player.piecesPos == [None, None, None, None] and movesInARow > 3):
+        currentPlayerIdx = (currentPlayerIdx + 1) % 2
+        movesInARow = 0
+    #print(f"Switched Player to {piece.color}")
+    #print(f"piecesPos = {current_player.piecesPos}, movesInARow = {movesInARow}")                        
+    moveComplete = True
+
 # Game loop
 running = True
 fullscreen = False
 moveComplete = True
 dice = 0
 movesInARow = 0
+current_player = players[currentPlayerIdx]
 while running:
     clock.tick(60)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE and moveComplete:
+            if event.key == pygame.K_SPACE and moveComplete and not current_player.bot:
                 dice = prepareMove(currentPlayerIdx)
-        if event.type == pygame.MOUSEBUTTONDOWN and not moveComplete:
+        if event.type == pygame.MOUSEBUTTONDOWN and not moveComplete and not current_player.bot:
             mouse_pos = pygame.mouse.get_pos()
             if not moveComplete:
                 current_player = players[currentPlayerIdx]
@@ -229,38 +280,41 @@ while running:
                     else:
                         piece_rect = pygame.Rect(current_player.colorSquare[piece.currentSquare][0], current_player.colorSquare[piece.currentSquare][1], piece.size, piece.size)
                     if piece_rect.collidepoint(mouse_pos) and current_player.moveable(piece.currentSquare, dice, piece):
-                        
-                        if piece.atHome:
-                            piece.currentSquare = 0
-                            piece.atHome = False                         
-                        else:
-                            piece.currentSquare += dice        
-                        current_player.piecesPos[piece.idx] = piece.currentSquare   
-                        newPos = current_player.colorSquare[piece.currentSquare]
-                        opp = players[(currentPlayerIdx+1)%2]
-                        #oppPiecePos = getPiecePositions(opp)
-                        for oppPiece in opp.pieces:
-                            if oppPiece.atHome:
-                                continue
-                            else:
-                                if opp.colorSquare[oppPiece.currentSquare] == newPos:
-                                    oppPiece.draw(opp.homeSquares[oppPiece.idx])
-                                    oppPiece.atHome = True
-                                    oppPiece.currentSquare = None
-                                    opp.piecesPos[oppPiece.idx] = None
-                                    break
-                        if dice != 6: #and not (current_player.piecesPos == [None, None, None, None] and movesInARow > 3):
-                            currentPlayerIdx = (currentPlayerIdx + 1) % 2
-                            movesInARow = 0
-                            #print(f"Switched Player to {piece.color}")
-                        #print(f"piecesPos = {current_player.piecesPos}, movesInARow = {movesInARow}")
-                        
-                        moveComplete = True
+                        chosenPiece = piece
+                        move(chosenPiece)                        
                         break  
                     #print(f"{piece.color} ist am Zug: {moveComplete}")
                 if moveComplete:
                     for piece in current_player.pieces:
                         piece.moveable = False
+    if moveComplete and current_player.bot:
+        dice = prepareMove(currentPlayerIdx)
+    if not moveComplete and current_player.bot:
+        current_player = players[currentPlayerIdx]
+        moveablePieces = []
+        for piece in current_player.pieces:
+            if current_player.moveable(piece.currentSquare, dice, piece):
+                moveablePieces.append(piece)
+        opp = players[(currentPlayerIdx+1)%2]
+        beatableIdx = []
+        for i, piece in enumerate(moveablePieces):
+            if current_player.canBeat(opp, dice, piece.currentSquare):
+                beatableIdx.append(i)
+        if len(beatableIdx) == 0:
+            chosenPiece = moveablePieces[random.randint(0, len(moveablePieces)-1)]
+            #print("Just random")
+        elif len(beatableIdx) == 1:
+            chosenPiece = moveablePieces[beatableIdx[0]]
+            #print("Bewusst geschlagen.")
+        elif len(beatableIdx) > 1:
+            chosenPiece = moveablePieces[beatableIdx[random.randint(0, len(beatableIdx)-1)]]
+            #print(f"Bewusst geschlagen, eine von {len(beatableIdx)} Schlägen ausgewählt")
+        move(chosenPiece)
+        if moveComplete:
+            for piece in current_player.pieces:
+                piece.moveable = False
+
+
     window_size = screen.get_size()
     bg_scaled, bg_pos = get_scaled_background(window_size)
     screen.fill((0, 0, 0))
@@ -278,6 +332,7 @@ while running:
                 piece.draw(player.colorSquare[piece.currentSquare])
     text_surface = font.render(f"{dice}", True, (255, 255, 255))
     screen.blit(text_surface, (WIDTH//2-60, HEIGHT//2-60))
+    current_player = players[currentPlayerIdx]
     pygame.display.flip()
 pygame.quit()
 sys.exit()
