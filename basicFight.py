@@ -31,10 +31,7 @@ enemy = {
     "rect": pygame.Rect(450, 175, 50, 50)
 }
 
-#def enemy_select():
-    #return.randint(1, 4)
-#if enemy_select = 1:
-    #enemy_image = pygame.transform.scale(pygame.image.load("yellow.png").convert_alpha(), (50, 50))
+
 
 
 player_turn = True
@@ -72,6 +69,18 @@ attack_image_pos2 = [0, 0]
 attack_image_speed2 = 12
 pending_attack_damage2 = 0        
 
+#enemy attack
+
+enemy_attack_image = pygame.image.load("Enemy Flame.png").convert_alpha()
+enemy_attack_image_active = False
+enemy_attack_image_pos = [0, 0]
+enemy_attack_image_speed = 12
+
+
+
+use_special = False
+
+
 def draw_text(text, x, y):
     screen.blit(font.render(text, True, WHITE), (x, y))
 
@@ -108,6 +117,19 @@ barrier_active2 = False
 barrier_timer2 = 0
 barrier_active3 = False
 barrier_timer3 = 0
+
+health_image = pygame.transform.scale(pygame.image.load("Health.png").convert_alpha(), (50, 50))
+health_rect = health_image.get_rect()
+
+health_active = False
+health_timer = 0
+
+FP_image = pygame.transform.scale(pygame.image.load("FP.png").convert_alpha(), (50, 50))
+FP_rect = FP_image.get_rect()
+
+FP_active = False
+FP_timer = 0
+
 
 def handle_block(dmg):
     global message
@@ -217,10 +239,15 @@ while running:
                             player['hp'] += 30
                             player['items']['hp'] -= 1
                             message = "Used HP item! +30 HP"
+                            health_active = True
+                            health_timer = pygame.time.get_ticks()
+                            
                         elif selected_index == 1 and player['items']['fp'] > 0:
                             player['fp'] += 3
                             player['items']['fp'] -= 1
                             message = "Used FP item! +3 FP"
+                            FP_active = True
+                            FP_timer = pygame.time.get_ticks()
                         else:
                             message = "No item left!"
                             continue
@@ -231,9 +258,12 @@ while running:
 
         elif event.type == pygame.USEREVENT:
             pygame.time.set_timer(pygame.USEREVENT, 0)
-            use_special = random.choice([True, False])
-            pending_enemy_damage = special_attack() if use_special else normal_attack()
-            message = f"Enemy used {'Special' if use_special else 'Normal'} Attack! Press SPACE to block!"
+            if use_special:
+                pending_enemy_damage = special_attack()
+                message = "Enemy used Special Attack! Press SPACE to block!"
+            else:
+                pending_enemy_damage = normal_attack()
+                message = "Enemy used Normal Attack! Press SPACE to block!"
             block_mode = True
             marker_x = 100
 
@@ -278,6 +308,21 @@ while running:
 
     draw_bars()
 
+    if health_active:
+        health_rect.midleft = (player['rect'].right + 5, player['rect'].centery)
+        screen.blit(health_image, health_rect)
+
+    if health_active and pygame.time.get_ticks() - health_timer > 1000:  # show for 1 second
+        health_active = False    
+
+    if FP_active:
+        FP_rect.midleft = (player['rect'].right + 5, player['rect'].centery)
+        screen.blit(FP_image, FP_rect)
+
+    if FP_active and pygame.time.get_ticks() - FP_timer > 1000:  # show for 1 second
+        FP_active = False
+
+
     if menu_open and not block_mode:
         if menu_type == 'attack':
             draw_menu(attack_options, selected_index)
@@ -287,6 +332,9 @@ while running:
     if block_mode and enemy['hp'] >= 1:
         draw_block_bar()
         marker_x += marker_speed
+        enemy_attack_image_active = True
+        # Start the projectile at the enemy's right
+        enemy_attack_image_pos = [enemy['rect'].left, enemy['rect'].centery]
         if marker_x > 530 or marker_x < 100:
             marker_speed *= -1
 
@@ -366,6 +414,29 @@ while running:
         # Draw the attack image
         attack_rect = attack_image.get_rect(center=(int(attack_image_pos2[0]), int(attack_image_pos2[1])))
         screen.blit(attack_image2, attack_rect)
+
+
+    if enemy_attack_image_active:
+        # Target is the player's center
+        target_x, target_y = player['rect'].center
+        if barrier_active0:
+            dx = target_x - enemy_attack_image_pos[0] 
+            dy = target_y - enemy_attack_image_pos[1]
+        else:
+            dx = target_x - enemy_attack_image_pos[0] + 70
+            dy = target_y - enemy_attack_image_pos[1]    
+        distance = (dx**2 + dy**2)**0.5 
+
+        if distance < enemy_attack_image_speed:
+            # On reaching the player, stop animation
+            enemy_attack_image_active = False
+        else:
+            enemy_attack_image_pos[0] += enemy_attack_image_speed * dx / distance
+            enemy_attack_image_pos[1] += enemy_attack_image_speed * dy / distance
+
+         # Draw the projectile
+        enemy_attack_rect = enemy_attack_image.get_rect(center=(int(enemy_attack_image_pos[0]), int(enemy_attack_image_pos[1])))
+        screen.blit(enemy_attack_image, enemy_attack_rect)
 
 
     if player['hp'] <= 0:
