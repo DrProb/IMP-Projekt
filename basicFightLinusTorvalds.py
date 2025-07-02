@@ -16,8 +16,8 @@ pygame.mixer.music.load('TakeTheTime8Bit.mp3')
 pygame.mixer.music.play(loops=-1)
 
 # Loud Sound Setup 
-loud_sound = pygame.mixer.Sound('Georgsyndrom.mp3')
-next_loud_sound_time = pygame.time.get_ticks() + random.randint(15000, 25000)
+loud_sound = pygame.mixer.Sound('GeorgsyndromFix.mp3')
+next_loud_timer = pygame.time.get_ticks() + random.randint(15000, 25000)  # 15-25 seconds
 
 # Font and Clock
 font = pygame.font.SysFont(None, 30)
@@ -44,7 +44,7 @@ enemy = {
 player_turn = True
 menu_open = False
 menu_type = None
-message = "Du wurdest von Oleg, Fassan und Ayale angegriffen"
+message = "Du wurdest von Linus Torvalds angegriffen"
 game_over = False
 
 block_mode = False
@@ -110,10 +110,12 @@ running = True
 while running:
     screen.fill(BLACK)
 
-    now = pygame.time.get_ticks()
-    if now >= next_loud_sound_time:
+    current_time = pygame.time.get_ticks()
+    if current_time >= next_loud_timer:
         loud_sound.play()
-        next_loud_sound_time = now + random.randint(15000, 25000)
+        player["hp"] -= 10
+        message = "Georgsyndrom. 10 schaden."
+        next_loud_timer = current_time + random.randint(15000, 25000)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

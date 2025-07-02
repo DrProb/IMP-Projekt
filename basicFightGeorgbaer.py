@@ -16,7 +16,7 @@ pygame.mixer.music.load('RUMine8Bit.mp3')
 pygame.mixer.music.play(loops=-1)
 
 # Load loud sound (replace filename as needed)
-loud_sound = pygame.mixer.Sound('Georgsyndrom.mp3')  # spielt metal pipe falling sound
+loud_sound = pygame.mixer.Sound('GeorgsyndromFix.mp3')  # spielt metal pipe falling sound
 
 # Font and timing
 font = pygame.font.SysFont(None, 30)
@@ -54,7 +54,7 @@ marker_x = 100
 marker_speed = 6
 
 # Timing for loud sound
-next_loud_sound_time = pygame.time.get_ticks() + random.randint(15000, 25000)
+next_loud_timer = pygame.time.get_ticks() + random.randint(15000, 25000)
 
 def normal_attack():
     return random.randint(10, 15)
@@ -111,6 +111,14 @@ pending_enemy_damage = 0
 running = True
 while running:
     screen.fill(BLACK)
+    
+    current_time = pygame.time.get_ticks()
+    if current_time >= next_loud_timer:
+        loud_sound.play()
+        player["hp"] -= 10
+        message = "Georgsyndrom. 10 schaden."
+        next_loud_timer = current_time + random.randint(15000, 25000)
+
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -215,12 +223,6 @@ while running:
     elif enemy['hp'] <= 0:
         message = "You won!"
         game_over = True
-
-    # Play loud sound at randomized intervals
-    current_time = pygame.time.get_ticks()
-    if current_time >= next_loud_sound_time:
-        loud_sound.play()
-        next_loud_sound_time = current_time + random.randint(15000, 25000)  # 15–25 seconds
 
     pygame.display.flip()
     clock.tick(60)
