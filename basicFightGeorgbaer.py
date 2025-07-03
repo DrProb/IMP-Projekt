@@ -36,9 +36,11 @@ player = {
     "rect": pygame.Rect(100, 200, 50, 50)
 }
 
+enemy_image = pygame.transform.scale(pygame.image.load("GeorgbaerSprite.png").convert_alpha(), (160, 225))
+
 enemy = {
     "hp": 400,
-    "rect": pygame.Rect(490, 200, 50, 50)
+    "rect": pygame.Rect(450, 100, 50, 50)
 }
 
 # Game state
@@ -64,6 +66,11 @@ def heavy_attack():
 
 def special_attack():
     return random.randint(35, 50)
+
+flasche_image = pygame.transform.scale(pygame.image.load("Flasche.png").convert_alpha(), (150, 150))
+flasche_rect = flasche_image.get_rect(topleft=(100, 0))
+flasche_active = False
+flasche_speed = 3
 
 def draw_text(text, x, y):
     screen.blit(font.render(text, True, WHITE), (x, y))
@@ -118,6 +125,8 @@ while running:
         player["hp"] -= 10
         message = "Georgsyndrom. 10 schaden."
         next_loud_timer = current_time + random.randint(15000, 25000)
+        flasche_active = True
+        flasche_rect.topleft = (50, 0)
 
 
     for event in pygame.event.get():
@@ -198,7 +207,7 @@ while running:
 
     # Draw characters
     pygame.draw.rect(screen, WHITE, player['rect'])
-    pygame.draw.rect(screen, RED, enemy['rect'])
+    screen.blit(enemy_image, enemy['rect'])
 
     # UI
     draw_bars()
@@ -216,6 +225,17 @@ while running:
             marker_speed *= -1
 
     draw_text(message, 10, HEIGHT - 30)
+
+    if flasche_active:
+        # Move the bottle down
+        flasche_rect.y += flasche_speed
+
+        # Check for collision with player
+        if flasche_rect.colliderect(player['rect']):
+         flasche_active = False  # Disappear on impact
+
+        # Draw the bottle
+        screen.blit(flasche_image, flasche_rect)
 
     if player['hp'] <= 0:
         message = "You lost!"
