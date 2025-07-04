@@ -151,6 +151,23 @@ class Player:
         if self.colorSquare[newPos] in oppPiecesCrd:
             canBeat = True
         return canBeat
+    
+    def threeMove(self):
+        threeMove = True
+        atHomeCount = 0
+        for piece in self.pieces:
+            if piece.atHome:
+                atHomeCount += 1
+        for pos in self.piecesPos:
+            if pos != None:
+                if pos <= len(self.colorSquare)-5 + atHomeCount:
+                    threeMove = False
+        print (f"threeMove = {threeMove} because piecesPos = {self.piecesPos}")
+        return threeMove
+
+
+
+
         
 
 
@@ -215,7 +232,7 @@ def prepareMove(currentPlayerIdxGiven):
         #print(f"idx vor Switch: {currentPlayerIdx}, also {colors[current_player.colorIdx]}")
         if dice != 6:
             currentPlayerIdx = (currentPlayerIdxGiven + 1) % 2
-        if current_player.piecesPos == [None, None, None, None]: #and movesInARow < 3:
+        if current_player.threeMove(): #and movesInARow < 3:
             currentPlayerIdx = (currentPlayerIdx+1) % 2
         if movesInARow >= 3:
             currentPlayerIdx = (currentPlayerIdx+1) % 2
