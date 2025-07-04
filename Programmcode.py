@@ -1,6 +1,7 @@
 import pygame
 import sys
 import random
+import time
 
 pygame.init()
 
@@ -203,8 +204,12 @@ def prepareMove(currentPlayerIdxGiven):
     moveComplete = False
     dice = random.randint(1,6)
     current_player = players[currentPlayerIdxGiven]
+    #for piece in current_player.pieces:
+        #current_player.moveable(piece.currentSquare, dice, piece)
     #print(f"{colors[current_player.colorIdx]} at turn. {movesInARow} Moves in a Row. Pieces at: {current_player.piecesPos}")
+    #print(f' Player is a Bot:{current_player.bot}')
     if not current_player.movePossible(dice):
+        #print(f' Player is a Bot:{current_player.bot} No Move Possible')
         moveComplete = True
         
         #print(f"idx vor Switch: {currentPlayerIdx}, also {colors[current_player.colorIdx]}")
@@ -258,6 +263,13 @@ def move(piece):
 # Game loop
 running = True
 fullscreen = False
+dice_frames = [pygame.image.load(f"pictures/dice/pics/frames/frame{i}.png").convert_alpha() for i in range(1, 10)]
+for i in range(len(dice_frames)):
+    dice_frames[i] = pygame.transform.scale(dice_frames[i], (120, 120))  # Optional skalieren
+isRolling = False
+diceFrameIndex = 0
+diceRollDelay = 2  # Anzahl Frames, die ein Bild angezeigt wird
+diceRollCounter = 0
 moveComplete = True
 dice = 0
 movesInARow = 0
@@ -269,7 +281,10 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE and moveComplete and not current_player.bot:
-                dice = prepareMove(currentPlayerIdx)
+                isRolling = True
+                diceFrameIndex = 0
+                diceRollCounter = 0
+                moveComplete = False
         if event.type == pygame.MOUSEBUTTONDOWN and not moveComplete and not current_player.bot:
             mouse_pos = pygame.mouse.get_pos()
             if not moveComplete:
@@ -288,8 +303,12 @@ while running:
                     for piece in current_player.pieces:
                         piece.moveable = False
     if moveComplete and current_player.bot:
-        dice = prepareMove(currentPlayerIdx)
-    if not moveComplete and current_player.bot:
+        isRolling = True
+        diceFrameIndex = 0
+        diceRollCounter = 0
+        moveComplete = False
+        #print('Still Alive')
+    if not moveComplete and current_player.bot and not isRolling:
         current_player = players[currentPlayerIdx]
         moveablePieces = []
         for piece in current_player.pieces:
@@ -330,8 +349,27 @@ while running:
                 piece.draw(player.homeSquares[piece.idx])
             else:
                 piece.draw(player.colorSquare[piece.currentSquare])
-    text_surface = font.render(f"{dice}", True, (255, 255, 255))
-    screen.blit(text_surface, (WIDTH//2-60, HEIGHT//2-60))
+    #if current_player.bot:
+        #print(f"diceRolling. {isRolling}")
+    if isRolling:
+        screen.blit(dice_frames[diceFrameIndex // diceRollDelay], (WIDTH//2 - 92, HEIGHT//2 - 76))  # zentriert zeichnen
+        diceRollCounter += 1
+        #print("Still alive")
+        if diceRollCounter >= diceRollDelay:
+            diceRollCounter = 0
+            diceFrameIndex += 1
+            #if current_player.bot:
+                #print('Still alive')
+        if diceFrameIndex >= len(dice_frames) * diceRollDelay:
+            isRolling = False
+            dice = prepareMove(currentPlayerIdx)
+    else:
+        if 0 < dice <= 6:
+            dice_image = pygame.image.load(f"pictures/dice/pics/dice{dice}.png").convert_alpha()
+        else:
+            dice_image = pygame.image.load(f"pictures/dice/pics/dice1.png").convert_alpha()
+        dice_image = pygame.transform.scale(dice_image, (120, 120))
+        screen.blit(dice_image, (WIDTH//2-92, HEIGHT//2-76))
     current_player = players[currentPlayerIdx]
     pygame.display.flip()
 pygame.quit()
