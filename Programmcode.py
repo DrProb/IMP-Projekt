@@ -4,6 +4,7 @@ import random
 import time
 
 pygame.init()
+pygame.mixer.init()
 
 # Screen setup
 WIDTH, HEIGHT = 1920, 1080
@@ -86,6 +87,245 @@ square = [
 (995, 490)
 ]
 
+def setupFight(startHp, givenMessage, music, enemySprite, georg, lenz, olfaay, friedrich, isLinus):
+    global playerFight, message, enemy_image, enemy, barrier_active0, barrier_timer0, barrier_active1, barrier_timer1, barrier_active2, barrier_timer2, barrier_active3, barrier_timer3, health_active, health_timer, FP_active, FP_timer, enemy_attack_image_active, enemy_attack_image_pos, enemy_attack_image_speed, use_special, flasche_active, flasche_speed, attack_image_active2, attack_image_pos2, attack_image_speed2, pending_attack_damage2, attack_image_active1, attack_image_pos1, attack_image_speed1, pending_attack_damage1, attack_image_active, attack_image_pos, attack_image_speed, pending_attack_damage, selected_index, pending_enemy_damage, game_over, block_mode, marker_x, marker_speed, block_result, player_turn, menu_open, menu_type, next_loud_timer, georgbaerSpecial, lenzFaktenVerweigererSpecial, olFaAySpecial, friedrichSchmerzSpecial, linus
+    georgbaerSpecial = georg
+    lenzFaktenVerweigererSpecial = lenz
+    olFaAySpecial = olfaay
+    friedrichSchmerzSpecial = friedrich
+    linus = isLinus
+    enemy['hp'] = startHp
+    message = givenMessage
+    pygame.mixer.music.load(f'sounds/{music}.mp3')
+    pygame.mixer.music.play(loops=-1)
+    enemy_image = pygame.transform.scale(pygame.image.load(f"pictures/fight/{enemySprite}.png").convert_alpha(), (100, 150))
+    playerFight = {
+    "hp": 100,
+    "fp": 10,
+    "items": {"hp": 2, "fp": 2},
+    "rect": pygame.Rect(100, 200, 50, 50)
+    }
+    barrier_active0 = False
+    barrier_timer0 = 0
+    barrier_active1 = False
+    barrier_timer1 = 0
+    barrier_active2 = False
+    barrier_timer2 = 0
+    barrier_active3 = False
+    barrier_timer3 = 0
+    health_active = False
+    health_timer = 0
+    FP_active = False
+    FP_timer = 0
+    enemy_attack_image_active = False
+    enemy_attack_image_pos = [0, 0]
+    enemy_attack_image_speed = 12
+
+    use_special = False
+    flasche_active = False
+    flasche_speed = 3
+    attack_image_active2 = False
+    attack_image_pos2 = [0, 0]
+    attack_image_speed2 = 12
+    pending_attack_damage2 = 0
+    attack_image_active1 = False
+    attack_image_pos1 = [0, 0]
+    attack_image_speed1 = 12
+    pending_attack_damage1 = 0
+    attack_image_active = False
+    attack_image_pos = [0, 0]
+    attack_image_speed = 12
+    pending_attack_damage = 0
+    selected_index = 0
+
+    pending_enemy_damage = 0
+    game_over = False
+
+    block_mode = False
+    marker_x = 100
+    marker_speed = 6
+    block_result = None
+    player_turn = True
+    menu_open = False
+    menu_type = None
+    next_loud_timer = pygame.time.get_ticks() + random.randint(15000, 25000) 
+
+
+
+# Background Music
+#pygame.mixer.music.load('sounds/TakeTheTime8Bit.mp3')
+#pygame.mixer.music.play(loops=-1)
+
+# Loud Sound Setup 
+loud_sound = pygame.mixer.Sound('sounds/GeorgsyndromFix.mp3')
+next_loud_timer = pygame.time.get_ticks() + random.randint(15000, 25000)  # 15-25 seconds
+
+# Font and Clock
+font = pygame.font.SysFont(None, 30)
+clock = pygame.time.Clock()
+
+# Colors
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+BLACK = (0, 0, 0)
+GREEN = (0, 255, 0)
+
+# Game State
+player_image = pygame.transform.scale(pygame.image.load("pictures/fight/blue.png").convert_alpha(), (50, 50))    
+playerFight = {
+    "hp": 100,
+    "fp": 10,
+    "items": {"hp": 2, "fp": 2},
+    "rect": pygame.Rect(100, 200, 50, 50)
+}
+
+#enemy_image = pygame.transform.scale(pygame.image.load("pictures/fight/LinusTorvaldsSprite.png").convert_alpha(), (100, 150))
+   
+enemy = {
+    "hp": 500,
+    "rect": pygame.Rect(450, 175, 50, 50)
+}
+
+georgbaerSpecial = False
+lenzFaktenVerweigererSpecial = False
+olFaAySpecial = False
+friedrichSchmerzSpecial = False
+linus = False
+
+player_turn = True
+menu_open = False
+menu_type = None
+message = "Du wurdest von Linus Torvalds angegriffen"
+game_over = False
+
+block_mode = False
+marker_x = 100
+marker_speed = 6
+block_result = None
+
+attack_options = ["Normal Attack", "Heavy Attack", "Special Attack"]
+item_options = ["Use HP Item", "Use FP Item"]
+selected_index = 0
+
+pending_enemy_damage = 0
+
+
+# --- Utility Functions ---
+def normal_attack():
+    return random.randint(10, 15)
+attack_image = pygame.image.load("pictures/fight/Flame.png").convert_alpha()
+attack_image_active = False
+attack_image_pos = [0, 0]
+attack_image_speed = 12
+pending_attack_damage = 0
+
+def heavy_attack():
+    return random.randint(15, 22)
+attack_image1 = pygame.image.load("pictures/fight/Blue Flame.png").convert_alpha()
+attack_image_active1 = False
+attack_image_pos1 = [0, 0]
+attack_image_speed1 = 12
+pending_attack_damage1 = 0
+
+
+def special_attack():
+        return random.randint(35, 50)
+attack_image2 = pygame.image.load("pictures/fight/Special.png").convert_alpha()
+attack_image_active2 = False
+attack_image_pos2 = [0, 0]
+attack_image_speed2 = 12
+pending_attack_damage2 = 0
+
+flasche_image = pygame.transform.scale(pygame.image.load("pictures/fight/Flasche.png").convert_alpha(), (150, 150))
+flasche_rect = flasche_image.get_rect(topleft=(100, 0))
+flasche_active = False
+flasche_speed = 3
+
+#enemy attack
+
+enemy_attack_image = pygame.image.load("pictures/fight/Enemy Flame.png").convert_alpha()
+enemy_attack_image_active = False
+enemy_attack_image_pos = [0, 0]
+enemy_attack_image_speed = 12
+
+use_special = False
+gameOver = False
+
+def draw_text(text, x, y):
+    screen.blit(font.render(text, True, WHITE), (x, y))
+
+def draw_bars():
+    draw_text(f"Player HP: {playerFight['hp']}", 10, 10)
+    draw_text(f"FP: {playerFight['fp']}", 10, 40)
+    draw_text(f"Enemy HP: {enemy['hp']}", WIDTH - 200, 10)
+
+def draw_menu(options, selected_index):
+    for i, option in enumerate(options):
+        color = WHITE if i != selected_index else RED
+        text = font.render(option, True, color)
+        screen.blit(text, (50, 300 + i * 30))
+
+def draw_block_bar():
+    pygame.draw.rect(screen, WHITE, (100, 400, 440, 10))
+    pygame.draw.rect(screen, RED, (310, 395, 20, 20))
+    pygame.draw.rect(screen, GREEN, (marker_x, 395, 10, 20))
+
+barrier_image0 = pygame.image.load("pictures/fight/Broken Barrier.png").convert_alpha()  
+barrier_rect0 = barrier_image0.get_rect()
+barrier_image3 = pygame.image.load("pictures/fight/Barrier 3.png").convert_alpha()  
+barrier_rect3 = barrier_image3.get_rect()
+barrier_image2 = pygame.image.load("pictures/fight/Barrier 2.png").convert_alpha()  
+barrier_rect2 = barrier_image2.get_rect()
+barrier_image1 = pygame.image.load("pictures/fight/Barrier 1.png").convert_alpha()  
+barrier_rect1 = barrier_image1.get_rect()
+
+barrier_active0 = False
+barrier_timer0 = 0
+barrier_active1 = False
+barrier_timer1 = 0
+barrier_active2 = False
+barrier_timer2 = 0
+barrier_active3 = False
+barrier_timer3 = 0
+
+health_image = pygame.transform.scale(pygame.image.load("pictures/fight/Health.png").convert_alpha(), (50, 50))
+health_rect = health_image.get_rect()
+
+health_active = False
+health_timer = 0
+
+FP_image = pygame.transform.scale(pygame.image.load("pictures/fight/FP.png").convert_alpha(), (50, 50))
+FP_rect = FP_image.get_rect()
+
+FP_active = False
+FP_timer = 0
+
+def handle_block(dmg):
+    global message
+    center = 320
+    distance = abs(marker_x - center)
+    if distance < 10:
+        blocked = dmg
+        global barrier_active3, barrier_timer3
+        barrier_active3 = True
+        message = f"Perfect block! Blocked all {dmg} damage!"
+    elif distance < 40:
+        blocked = int(dmg * 0.6)
+        global barrier_active2, barrier_timer2
+        barrier_active2 = True
+        message = f"Good block! Blocked {blocked} of {dmg} damage!"
+    elif distance < 80:
+        blocked = int(dmg * 0.3)
+        global barrier_active1, barrier_timer1
+        barrier_active1 = True
+        message = f"Partial block. Blocked {blocked} of {dmg} damage."
+    else:
+        blocked = 0
+        global barrier_active0, barrier_timer0
+        barrier_active0 = True
+        message = f"Missed block! Took full {dmg} damage."
+    return max(dmg - blocked, 0)
+
 clock = pygame.time.Clock()
 
 class Player:
@@ -162,8 +402,19 @@ class Player:
             if pos != None:
                 if pos <= len(self.colorSquare)-5 + atHomeCount:
                     threeMove = False
-        print (f"threeMove = {threeMove} because piecesPos = {self.piecesPos}")
+        #print (f"threeMove = {threeMove} because piecesPos = {self.piecesPos}")
         return threeMove
+    
+    def won(self):
+        won = True
+        for pos in self.piecesPos:
+            if pos == None:
+                won = False
+                continue
+            if pos <= len(self.colorSquare)-5:
+                won = False
+        return won
+
 
 
 
@@ -199,7 +450,7 @@ class Piece:
 players = [] #Player(2*i) for i in range(2)
 players.append(Player(0, False))
 players.append(Player(2, True))
-
+fightActive = False
 background = pygame.image.load("pictures/ludoBackground3.png")
 bg_width, bg_height = background.get_size()
 
@@ -219,7 +470,7 @@ def prepareMove(currentPlayerIdxGiven):
     movesInARow += 1
     #currentPlayerIdx = currentPlayerIdx
     moveComplete = False
-    dice = random.randint(1,6)
+    #dice = random.randint(1,6)
     current_player = players[currentPlayerIdxGiven]
     #for piece in current_player.pieces:
         #current_player.moveable(piece.currentSquare, dice, piece)
@@ -249,8 +500,32 @@ def getPiecePositions(player):
             currentPos.append(player.colorSquare(myPiece.currentSquare))
     return currentPos
 
+def endMove(losingPiece, losingPlayer):
+    pygame.mixer.music.stop()
+    global movesInARow, moveComplete, currentPlayerIdx
+    losingPiece.draw(losingPlayer.homeSquares[losingPiece.idx])
+    losingPiece.atHome = True
+    losingPiece.currentSquare = None
+    losingPlayer.piecesPos[losingPiece.idx] = None
+
+    if dice != 6: #and not (current_player.piecesPos == [None, None, None, None] and movesInARow > 3):
+        currentPlayerIdx = (currentPlayerIdx + 1) % 2
+        movesInARow = 0
+    #print(f"Switched Player to {piece.color}")
+    #print(f"piecesPos = {current_player.piecesPos}, movesInARow = {movesInARow}")                        
+    moveComplete = True
+    if moveComplete:
+        for piece in current_player.pieces:
+            piece.moveable = False
+    opp = players[currentPlayerIdx]
+    #oppPiecePos = getPiecePositions(opp)
+    for oppPiece in opp.pieces:
+        oppPiece.moveable = False
+        
+
 def move(piece):
-    global movesInARow, moveComplete, current_player, currentPlayerIdx
+    global movesInARow, moveComplete, current_player, currentPlayerIdx, fightActive, playerPiece, botPiece, gameOver, background
+    #print("move")
     if piece.atHome:
         piece.currentSquare = 0
         piece.atHome = False                         
@@ -265,20 +540,63 @@ def move(piece):
             continue
         else:
             if opp.colorSquare[oppPiece.currentSquare] == newPos:
-                oppPiece.draw(opp.homeSquares[oppPiece.idx])
-                oppPiece.atHome = True
-                oppPiece.currentSquare = None
-                opp.piecesPos[oppPiece.idx] = None
+                #print("Geschlagen")
+                if current_player.bot:
+                    playerPiece = oppPiece
+                    botPiece = piece
+                else:
+                    playerPiece = piece
+                    botPiece = oppPiece
+                if botPiece.idx == 0:
+                    setupFight(300, 'Du wurdest von Herr Lenz-Faktenverweigerer angegriffen', 'ThisCharmingMan8Bit', 'LenzFaktenverweigererSprite', False, True, False, False, False) #glof
+                if botPiece.idx == 1:
+                    setupFight(400, 'Du wurdest von Friedrich Schmerz angegriffen', 'ImTheOne8Bit', 'FriedrichSchmerzSprite', False, False, False, True, False)
+                if botPiece.idx == 2:
+                    setupFight(400, 'Du wurdest von Georgbär angegriffen', 'RUMine8Bit', 'GeorgbaerSprite', True, False, False, False, False)
+                if botPiece.idx == 3:
+                    setupFight(300, 'Du wurdest von Oleg, Fassan und Ayale angegriffen', 'RickRoll8Bit', 'OlegFassanAyaleSprite', False, False, True, False, False)
+                fightActive = True
                 break
-    if dice != 6: #and not (current_player.piecesPos == [None, None, None, None] and movesInARow > 3):
-        currentPlayerIdx = (currentPlayerIdx + 1) % 2
-        movesInARow = 0
+    
+    if current_player.won():
+        if not current_player.bot:
+            abilities = []
+            if current_player.bot:
+                bot = current_player
+            else:
+                bot = opp
+            for pos in bot.piecesPos:
+                if pos == None:
+                    abilities.append(False)
+                    continue
+                if pos >= len(bot.colorSquare)-4:
+                    abilities.append(True)
+                else:
+                    abilities.append(False)
+            lenz = abilities[0]
+            friedrich = abilities[1]
+            georg = abilities[2]
+            olfaay = abilities[3]
+            setupFight(500, 'Du wurdest von Linus Torvalds angegriffen', 'TakeTheTime8Bit', 'LinusTorvaldsSprite', georg, lenz, olfaay, friedrich, True)
+            fightActive = True
+        else:
+            gameOver = True
+            background = pygame.image.load("pictures/losingScreen.png")
+
+    if not fightActive:
+        if dice != 6: #and not (current_player.piecesPos == [None, None, None, None] and movesInARow > 3):
+            currentPlayerIdx = (currentPlayerIdx + 1) % 2
+            movesInARow = 0
     #print(f"Switched Player to {piece.color}")
     #print(f"piecesPos = {current_player.piecesPos}, movesInARow = {movesInARow}")                        
-    moveComplete = True
+        moveComplete = True
+        #print(moveComplete)
 
-# Game loop
+
+                
 running = True
+playerPiece = None
+botPiece = None
 fullscreen = False
 dice_frames = [pygame.image.load(f"pictures/dice/pics/frames/frame{i}.png").convert_alpha() for i in range(1, 10)]
 for i in range(len(dice_frames)):
@@ -291,103 +609,462 @@ moveComplete = True
 dice = 0
 movesInARow = 0
 current_player = players[currentPlayerIdx]
+
+# Game loop
 while running:
-    clock.tick(60)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE and moveComplete and not current_player.bot:
+    if not fightActive and not gameOver:
+        
+        #while running:
+            #print("onBoard")
+            clock.tick(60)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT and not fightActive:
+                    running = False
+                if event.type == pygame.KEYDOWN and not fightActive:
+                    if event.key == pygame.K_SPACE and moveComplete and not current_player.bot and not fightActive:
+                        isRolling = True
+                        diceFrameIndex = 0
+                        diceRollCounter = 0
+                        moveComplete = False
+                        dice = random.randint(1,6)
+                if event.type == pygame.MOUSEBUTTONDOWN and not moveComplete and not current_player.bot and not fightActive:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if not moveComplete and not fightActive:
+                        current_player = players[currentPlayerIdx]
+                        for piece in current_player.pieces:
+                            if piece.atHome: 
+                                piece_rect = pygame.Rect(current_player.homeSquares[piece.idx][0], current_player.homeSquares[piece.idx][1], piece.size, piece.size)
+                            else:
+                                piece_rect = pygame.Rect(current_player.colorSquare[piece.currentSquare][0], current_player.colorSquare[piece.currentSquare][1], piece.size, piece.size)
+                            if piece_rect.collidepoint(mouse_pos) and current_player.moveable(piece.currentSquare, dice, piece):
+                                chosenPiece = piece
+                                move(chosenPiece)                        
+                                break  
+                                #print(f"{piece.color} ist am Zug: {moveComplete}")
+                        if moveComplete and not fightActive:
+                            for piece in current_player.pieces:
+                                piece.moveable = False
+            if moveComplete and current_player.bot and not fightActive:
                 isRolling = True
                 diceFrameIndex = 0
                 diceRollCounter = 0
                 moveComplete = False
-        if event.type == pygame.MOUSEBUTTONDOWN and not moveComplete and not current_player.bot:
-            mouse_pos = pygame.mouse.get_pos()
-            if not moveComplete:
+                dice = random.randint(1,6)
+                #print('Still Alive')
+            if not moveComplete and current_player.bot and not isRolling and not fightActive:
                 current_player = players[currentPlayerIdx]
+                moveablePieces = []
                 for piece in current_player.pieces:
-                    if piece.atHome: 
-                        piece_rect = pygame.Rect(current_player.homeSquares[piece.idx][0], current_player.homeSquares[piece.idx][1], piece.size, piece.size)
-                    else:
-                        piece_rect = pygame.Rect(current_player.colorSquare[piece.currentSquare][0], current_player.colorSquare[piece.currentSquare][1], piece.size, piece.size)
-                    if piece_rect.collidepoint(mouse_pos) and current_player.moveable(piece.currentSquare, dice, piece):
-                        chosenPiece = piece
-                        move(chosenPiece)                        
-                        break  
-                    #print(f"{piece.color} ist am Zug: {moveComplete}")
+                    if current_player.moveable(piece.currentSquare, dice, piece):
+                        moveablePieces.append(piece)
+                opp = players[(currentPlayerIdx+1)%2]
+                beatableIdx = []
+                for i, piece in enumerate(moveablePieces):
+                    if current_player.canBeat(opp, dice, piece.currentSquare):
+                        beatableIdx.append(i)
+                if len(beatableIdx) == 0:
+                    chosenPiece = moveablePieces[random.randint(0, len(moveablePieces)-1)]
+                    #print("Just random")
+                elif len(beatableIdx) == 1:
+                    chosenPiece = moveablePieces[beatableIdx[0]]
+                    #print("Bewusst geschlagen.")
+                elif len(beatableIdx) > 1:
+                    chosenPiece = moveablePieces[beatableIdx[random.randint(0, len(beatableIdx)-1)]]
+                    #print(f"Bewusst geschlagen, eine von {len(beatableIdx)} Schlägen ausgewählt")
+                move(chosenPiece)
                 if moveComplete:
                     for piece in current_player.pieces:
                         piece.moveable = False
-    if moveComplete and current_player.bot:
-        isRolling = True
-        diceFrameIndex = 0
-        diceRollCounter = 0
-        moveComplete = False
-        #print('Still Alive')
-    if not moveComplete and current_player.bot and not isRolling:
-        current_player = players[currentPlayerIdx]
-        moveablePieces = []
-        for piece in current_player.pieces:
-            if current_player.moveable(piece.currentSquare, dice, piece):
-                moveablePieces.append(piece)
-        opp = players[(currentPlayerIdx+1)%2]
-        beatableIdx = []
-        for i, piece in enumerate(moveablePieces):
-            if current_player.canBeat(opp, dice, piece.currentSquare):
-                beatableIdx.append(i)
-        if len(beatableIdx) == 0:
-            chosenPiece = moveablePieces[random.randint(0, len(moveablePieces)-1)]
-            #print("Just random")
-        elif len(beatableIdx) == 1:
-            chosenPiece = moveablePieces[beatableIdx[0]]
-            #print("Bewusst geschlagen.")
-        elif len(beatableIdx) > 1:
-            chosenPiece = moveablePieces[beatableIdx[random.randint(0, len(beatableIdx)-1)]]
-            #print(f"Bewusst geschlagen, eine von {len(beatableIdx)} Schlägen ausgewählt")
-        move(chosenPiece)
-        if moveComplete:
-            for piece in current_player.pieces:
-                piece.moveable = False
 
 
-    window_size = screen.get_size()
-    bg_scaled, bg_pos = get_scaled_background(window_size)
-    screen.fill((0, 0, 0))
-    screen.blit(bg_scaled, bg_pos)
-    keys = pygame.key.get_pressed()
-    #if keys[pygame.K_LEFT]:
-        #player_pos[0] -= player_speed
-    #player_pos[0] = max(0, min(window_size[0] - player_size, player_pos[0]))
-    #player_pos[1] = max(0, min(window_size[1] - player_size, player_pos[1]))
-    for player in players:
-        for piece in player.pieces:
-            if piece.atHome:
-                piece.draw(player.homeSquares[piece.idx])
-            else:
-                piece.draw(player.colorSquare[piece.currentSquare])
-    #if current_player.bot:
-        #print(f"diceRolling. {isRolling}")
-    if isRolling:
-        screen.blit(dice_frames[diceFrameIndex // diceRollDelay], (WIDTH//2 - 92, HEIGHT//2 - 76))  # zentriert zeichnen
-        diceRollCounter += 1
-        #print("Still alive")
-        if diceRollCounter >= diceRollDelay:
-            diceRollCounter = 0
-            diceFrameIndex += 1
+            window_size = screen.get_size()
+            bg_scaled, bg_pos = get_scaled_background(window_size)
+            screen.fill((0, 0, 0))
+            screen.blit(bg_scaled, bg_pos)
+            keys = pygame.key.get_pressed()
+            #if keys[pygame.K_LEFT]:
+                #player_pos[0] -= player_speed
+            #player_pos[0] = max(0, min(window_size[0] - player_size, player_pos[0]))
+            #player_pos[1] = max(0, min(window_size[1] - player_size, player_pos[1]))
+            for player in players:
+                for piece in player.pieces:
+                    if piece.atHome:
+                        piece.draw(player.homeSquares[piece.idx])
+                    else:
+                        piece.draw(player.colorSquare[piece.currentSquare])
             #if current_player.bot:
-                #print('Still alive')
-        if diceFrameIndex >= len(dice_frames) * diceRollDelay:
-            isRolling = False
-            dice = prepareMove(currentPlayerIdx)
-    else:
-        if 0 < dice <= 6:
-            dice_image = pygame.image.load(f"pictures/dice/pics/dice{dice}.png").convert_alpha()
-        else:
-            dice_image = pygame.image.load(f"pictures/dice/pics/dice1.png").convert_alpha()
-        dice_image = pygame.transform.scale(dice_image, (120, 120))
-        screen.blit(dice_image, (WIDTH//2-92, HEIGHT//2-76))
-    current_player = players[currentPlayerIdx]
-    pygame.display.flip()
+        #print(f"diceRolling. {isRolling}")
+            if isRolling:
+                screen.blit(dice_frames[diceFrameIndex // diceRollDelay], (WIDTH//2 - 92, HEIGHT//2 - 76))  # zentriert zeichnen
+                diceRollCounter += 1
+                #print("Still alive")
+                if diceRollCounter >= diceRollDelay:
+                    diceRollCounter = 0
+                    diceFrameIndex += 1
+                #if current_player.bot:
+                        #print('Still alive')
+                if diceFrameIndex >= len(dice_frames) * diceRollDelay:
+                    isRolling = False
+                    dice = prepareMove(currentPlayerIdx)
+            else:
+                if 0 < dice <= 6:
+                    dice_image = pygame.image.load(f"pictures/dice/pics/dice{dice}.png").convert_alpha()
+                else:
+                    dice_image = pygame.image.load(f"pictures/dice/pics/dice1.png").convert_alpha()
+                dice_image = pygame.transform.scale(dice_image, (120, 120))
+                screen.blit(dice_image, (WIDTH//2-92, HEIGHT//2-76))
+            current_player = players[currentPlayerIdx]
+            pygame.display.flip()
+
+            #print(fightActive)
+    if fightActive and not gameOver:
+    #setupFight(300, 'Du wurdest von Herr Lenz-Faktenverweigerer angegriffen', 'ThisCharmingMan8Bit', 'LenzFaktenverweigererSprite')
+    #running = True
+    #while running:
+        #print("Fight started:")
+        screen.fill(BLACK)
+
+        current_time = pygame.time.get_ticks()
+
+        if georgbaerSpecial:
+            if current_time >= next_loud_timer: #Georgsyndrom
+                loud_sound.play()
+                playerFight["hp"] -= 10
+                message = "Georgsyndrom. 10 schaden."
+                next_loud_timer = current_time + random.randint(15000, 25000)
+                flasche_active = True
+                flasche_rect.topleft = (50, 0) #georgsyndrom ende
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+            if friedrichSchmerzSpecial:
+                if not block_mode and event.type == pygame.KEYDOWN: #friedrich
+                    if random.random() < 0.25:
+                        playerFight['hp'] -= 2
+                        message = "Du leidest an Friedrich Schmerzen" #friedrich
+
+            if not game_over and player_turn and not block_mode:
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
+                    if not menu_open:
+                        menu_open = True
+                        menu_type = 'attack'
+                        selected_index = 0
+                    else:
+                        menu_type = 'item' if menu_type == 'attack' else 'attack'
+                        selected_index = 0
+
+                if event.type == pygame.KEYDOWN and menu_open:
+                    if event.key == pygame.K_UP:
+                        selected_index = (selected_index - 1) % (3 if menu_type == 'attack' else 2)
+                    elif event.key == pygame.K_DOWN:
+                        selected_index = (selected_index + 1) % (3 if menu_type == 'attack' else 2)
+                    elif event.key == pygame.K_RETURN:
+                        if menu_type == 'attack':
+                            if lenzFaktenVerweigererSpecial:
+                                if random.random() < 0.5: #lenz
+                                    message = "Angriff wurde verweigert"
+                                    menu_open = False
+                                    player_turn = False
+                                    pygame.time.set_timer(pygame.USEREVENT, 1000)
+                                    continue #lenz
+
+                            if selected_index == 0:  # Normal
+                                pending_attack_damage = normal_attack()
+                                # Start the image from just beside the player
+                                attack_image_pos = [playerFight['rect'].right, playerFight['rect'].centery]
+                                attack_image_active = True
+                                menu_open = False
+                                dmg = normal_attack()
+                            elif selected_index == 1:  # Heavy
+                                if playerFight['fp'] >= 1:
+                                    pending_attack_damage1 = heavy_attack()
+                                    # Start the image from just beside the player
+                                    attack_image_pos1 = [playerFight['rect'].right, playerFight['rect'].centery]
+                                    attack_image_active1 = True
+                                    menu_open = False
+                                    dmg = heavy_attack()
+                                    playerFight['fp'] -= 1
+                                else:
+                                    message = "Not enough FP for Heavy Attack!"
+                                    continue
+                            elif selected_index == 2:  # Special
+                                if playerFight['fp'] >= 3:
+                                    pending_attack_damage2 = special_attack()
+                                    # Start the image from just beside the player
+                                    attack_image_pos2 = [playerFight['rect'].right, playerFight['rect'].centery]
+                                    attack_image_active2 = True
+                                    menu_open = False
+                                    dmg = special_attack()
+                                    playerFight['fp'] -= 3
+                                else:
+                                    message = "Not enough FP for Special Attack!"
+                                    continue
+                            # Backfire chance
+                            if olFaAySpecial:
+                                if random.random() < 0.5: #olfaay
+                                    backfire = int(dmg * random.uniform(0.3, 0.7))
+                                    playerFight['hp'] -= backfire
+                                    message = random.choice(["Oleg meine Eier", "Fassan meine Eier", "Ayale gen"])
+
+                        elif menu_type == 'item':
+                            if selected_index == 0 and playerFight['items']['hp'] > 0:
+                                playerFight['hp'] += 30
+                                playerFight['items']['hp'] -= 1
+                                message = "Used HP item! +30 HP"
+                                health_active = True
+                                health_timer = pygame.time.get_ticks()
+
+                            elif selected_index == 1 and playerFight['items']['fp'] > 0:
+                                playerFight['fp'] += 3
+                                playerFight['items']['fp'] -= 1
+                                message = "Used FP item! +3 FP"
+                                FP_active = True
+                                FP_timer = pygame.time.get_ticks()
+                            else:
+                                message = "No item left!"
+                                continue
+                        menu_open = False
+                        player_turn = False
+                        pygame.time.set_timer(pygame.USEREVENT, 1000)
+
+            elif event.type == pygame.USEREVENT:
+                pygame.time.set_timer(pygame.USEREVENT, 0)
+                if use_special:
+                    pending_enemy_damage = special_attack()
+                    message = "Enemy used Special Attack! Press SPACE to block!"
+                else:
+                    pending_enemy_damage = normal_attack()
+                    message = "Enemy used Normal Attack! Press SPACE to block!"
+                block_mode = True
+                marker_x = 100
+
+            elif block_mode and event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    final_dmg = handle_block(pending_enemy_damage)
+                    playerFight['hp'] -= final_dmg
+                    block_mode = False
+                    player_turn = True
+
+
+
+
+        screen.blit(player_image, playerFight['rect'])
+        screen.blit(enemy_image, enemy['rect'])
+
+        if barrier_active0:
+            barrier_rect0.midleft = (playerFight['rect'].right + 5, playerFight['rect'].centery)
+            screen.blit(barrier_image0, barrier_rect0)
+
+        if barrier_active1:
+            barrier_rect1.midleft = (playerFight['rect'].right + 5, playerFight['rect'].centery)
+            screen.blit(barrier_image1, barrier_rect1)
+
+        if barrier_active2:
+            barrier_rect2.midleft = (playerFight['rect'].right + 5, playerFight['rect'].centery)
+            screen.blit(barrier_image2, barrier_rect2)
+
+        if barrier_active3:
+            barrier_rect3.midleft = (playerFight['rect'].right + 5, playerFight['rect'].centery)
+            screen.blit(barrier_image3, barrier_rect3)
+
+
+        if barrier_active0 and pygame.time.get_ticks() - barrier_timer0 > 1000:  # Barrier lasts 1 second
+            barrier_active0 = False
+
+        if barrier_active1 and pygame.time.get_ticks() - barrier_timer1 > 1000:  # Barrier lasts 1 second
+            barrier_active1 = False
+
+        if barrier_active2 and pygame.time.get_ticks() - barrier_timer2 > 1000:  # Barrier lasts 1 second
+            barrier_active2 = False
+
+        if barrier_active3 and pygame.time.get_ticks() - barrier_timer3 > 1000:  # Barrier lasts 1 second
+            barrier_active3 = False
+
+        draw_bars()
+
+        if health_active:
+            health_rect.midleft = (playerFight['rect'].right + 5, playerFight['rect'].centery)
+            screen.blit(health_image, health_rect)
+
+        if health_active and pygame.time.get_ticks() - health_timer > 1000:  # show for 1 second
+            health_active = False    
+
+        if FP_active:
+            FP_rect.midleft = (playerFight['rect'].right + 5, playerFight['rect'].centery)
+            screen.blit(FP_image, FP_rect)
+
+        if FP_active and pygame.time.get_ticks() - FP_timer > 1000:  # show for 1 second
+            FP_active = False
+
+        if menu_open and not block_mode:
+            if menu_type == 'attack':
+                draw_menu(attack_options, selected_index)
+            elif menu_type == 'item':
+                draw_menu(item_options, selected_index)
+
+        if block_mode and enemy['hp'] >= 1:
+            draw_block_bar()
+            marker_x += marker_speed
+            enemy_attack_image_active = True
+            # Start the projectile at the enemy's right
+            enemy_attack_image_pos = [enemy['rect'].left, enemy['rect'].centery]
+            if marker_x > 530 or marker_x < 100:
+                marker_speed *= -1
+
+        draw_text(message, 10, HEIGHT - 30)
+
+        if attack_image_active:
+        # Target is the center of the enemy
+            target_x, target_y = enemy['rect'].center
+
+            dx = target_x - attack_image_pos[0]
+            dy = target_y - attack_image_pos[1]
+            distance = (dx**2 + dy**2)**0.5
+
+            if distance < attack_image_speed:
+                # Damage applied on arrival
+                enemy['hp'] -= pending_attack_damage
+                attack_image_active = False
+                pending_attack_damage = 0
+                player_turn = False
+                pygame.time.set_timer(pygame.USEREVENT, 1000)
+                message = f"Normal Attack hit for {enemy['hp']} damage!"
+            else:
+                # Move image toward the enemy
+                attack_image_pos[0] += attack_image_speed * dx / distance
+                attack_image_pos[1] += attack_image_speed * dy / distance
+
+            # Draw the attack image
+            attack_rect = attack_image.get_rect(center=(int(attack_image_pos[0]), int(attack_image_pos[1])))
+            screen.blit(attack_image, attack_rect)
+
+        if attack_image_active1:
+        # Target is the center of the enemy
+            target_x1, target_y1  = enemy['rect'].center
+
+            dx1 = target_x1 - attack_image_pos1[0] - 40
+            dy1 = target_y1 - attack_image_pos1[1] - 10
+            distance1 = (dx1**2 + dy1**2)**0.5
+
+            if distance1 < attack_image_speed1:
+                # Damage applied on arrival
+                enemy['hp'] -= pending_attack_damage1
+                attack_image_active1 = False
+                pending_attack_damage1 = 0
+                player_turn = False
+                pygame.time.set_timer(pygame.USEREVENT, 1000)
+                message = f"Normal Attack hit for {enemy['hp']} damage!"
+            else:
+                # Move image toward the enemy
+                attack_image_pos1[0] += attack_image_speed1 * dx1 / distance1
+                attack_image_pos1[1] += attack_image_speed1 * dy1 / distance1
+        # Draw the attack image
+            attack_rect = attack_image.get_rect(center=(int(attack_image_pos1[0]), int(attack_image_pos1[1])))
+            screen.blit(attack_image1, attack_rect)
+        if attack_image_active2:
+        # Target is the center of the enemy
+            target_x2, target_y2 = enemy['rect'].right, enemy['rect'].centery
+            dx2 = target_x2 - attack_image_pos2[0] 
+            dy2 = target_y2 - attack_image_pos2[1] 
+            distance2 = (dx2**2 + dy2**2)**0.5
+
+            if distance2 < attack_image_speed2:
+            # Damage applied on arrival
+                enemy['hp'] -= pending_attack_damage2
+                attack_image_active2 = False
+                pending_attack_damage2 = 0
+                player_turn = False
+                pygame.time.set_timer(pygame.USEREVENT, 1000)
+                message = f"Normal Attack hit for {enemy['hp']} damage!"
+            else:
+                # Move image toward the enemy
+                attack_image_pos2[0] += attack_image_speed2 * dx2 / distance2
+                attack_image_pos2[1] += attack_image_speed2 * dy2 / distance2
+
+        # Draw the attack image
+            attack_rect = attack_image.get_rect(center=(int(attack_image_pos2[0]), int(attack_image_pos2[1])))
+            screen.blit(attack_image2, attack_rect)
+
+        if enemy_attack_image_active:
+            # Target is the player's center
+            target_x, target_y = playerFight['rect'].center
+            if barrier_active0:
+                dx = target_x - enemy_attack_image_pos[0] 
+                dy = target_y - enemy_attack_image_pos[1]
+            else:
+                dx = target_x - enemy_attack_image_pos[0] + 70
+                dy = target_y - enemy_attack_image_pos[1]    
+            distance = (dx**2 + dy**2)**0.5 
+
+            if distance < enemy_attack_image_speed:
+                # On reaching the player, stop animation
+                enemy_attack_image_active = False
+            else:
+                enemy_attack_image_pos[0] += enemy_attack_image_speed * dx / distance
+                enemy_attack_image_pos[1] += enemy_attack_image_speed * dy / distance
+
+             # Draw the projectile
+            enemy_attack_rect = enemy_attack_image.get_rect(center=(int(enemy_attack_image_pos[0]), int(enemy_attack_image_pos[1])))
+            screen.blit(enemy_attack_image, enemy_attack_rect)
+
+        if flasche_active and georgbaerSpecial: #georg
+            # Move the bottle down
+            flasche_rect.y += flasche_speed
+
+            # Check for collision with player
+            if flasche_rect.colliderect(playerFight['rect']):
+                flasche_active = False  # Disappear on impact
+
+            # Draw the bottle
+            screen.blit(flasche_image, flasche_rect) #georg
+
+
+
+        if playerFight['hp'] <= 0:
+            message = "You lost!"
+            game_over = True
+            if not linus:
+                for player in players:
+                    if not player.bot:
+                        playerPlayer = player
+                endMove(playerPiece, playerPlayer)
+                fightActive = False
+            else:
+                gameOver = True
+                background = pygame.image.load("pictures/losingScreen.png")
+        elif enemy['hp'] <= 0:
+            message = "You won!"
+            game_over = True
+            for player in players:
+                if player.bot:
+                    botPlayer = player
+            endMove(botPiece, botPlayer)
+            fightActive = False
+
+        pygame.display.flip()
+        clock.tick(60)
+    
+    if gameOver:
+        clock.tick(60)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                    running = False      
+            window_size = screen.get_size()
+            losingScreen_scaled, bg_pos = get_scaled_background(window_size)
+            screen.fill((0, 0, 0))
+            screen.blit(losingScreen_scaled, bg_pos)
+            pygame.display.flip()
+
 pygame.quit()
 sys.exit()
+
+#1. dice fix #5
+#2. winning/losing screen #4
+#3. put onboard prio #6
+#4. correct enemy #done
+#5. datenbanken #3
+#6. richtige größe #1
+#7. design #2
+#8. linus fight #0
