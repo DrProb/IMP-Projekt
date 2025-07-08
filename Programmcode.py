@@ -87,23 +87,26 @@ square = [
 (995, 490)
 ]
 
-def setupFight(startHp, givenMessage, music, enemySprite, georg, lenz, olfaay, friedrich, isLinus):
+def setupFight(startHp, givenMessage, music, enemySprite, georg, lenz, olfaay, friedrich, isLinus, width, height):
     global playerFight, message, enemy_image, enemy, barrier_active0, barrier_timer0, barrier_active1, barrier_timer1, barrier_active2, barrier_timer2, barrier_active3, barrier_timer3, health_active, health_timer, FP_active, FP_timer, enemy_attack_image_active, enemy_attack_image_pos, enemy_attack_image_speed, use_special, flasche_active, flasche_speed, attack_image_active2, attack_image_pos2, attack_image_speed2, pending_attack_damage2, attack_image_active1, attack_image_pos1, attack_image_speed1, pending_attack_damage1, attack_image_active, attack_image_pos, attack_image_speed, pending_attack_damage, selected_index, pending_enemy_damage, game_over, block_mode, marker_x, marker_speed, block_result, player_turn, menu_open, menu_type, next_loud_timer, georgbaerSpecial, lenzFaktenVerweigererSpecial, olFaAySpecial, friedrichSchmerzSpecial, linus
     georgbaerSpecial = georg
     lenzFaktenVerweigererSpecial = lenz
     olFaAySpecial = olfaay
     friedrichSchmerzSpecial = friedrich
     linus = isLinus
-    enemy['hp'] = startHp
+    enemy = {
+    "hp": startHp,
+    "rect": pygame.Rect(1920-width*1.4, 215, height, height)
+    }
     message = givenMessage
     pygame.mixer.music.load(f'sounds/{music}.mp3')
     pygame.mixer.music.play(loops=-1)
-    enemy_image = pygame.transform.scale(pygame.image.load(f"pictures/fight/{enemySprite}.png").convert_alpha(), (100, 150))
+    enemy_image = pygame.transform.scale(pygame.image.load(f"pictures/fight/{enemySprite}.png").convert_alpha(), (width, height))
     playerFight = {
     "hp": 100,
     "fp": 10,
     "items": {"hp": 2, "fp": 2},
-    "rect": pygame.Rect(100, 200, 50, 50)
+    "rect": pygame.Rect(100, 200, 612, 612)
     }
     barrier_active0 = False
     barrier_timer0 = 0
@@ -171,7 +174,7 @@ BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 
 # Game State
-player_image = pygame.transform.scale(pygame.image.load("pictures/fight/blue.png").convert_alpha(), (50, 50))    
+player_image = pygame.transform.scale(pygame.image.load("pictures/fight/PlayerSprite.png").convert_alpha(), (408, 612))    
 playerFight = {
     "hp": 100,
     "fp": 10,
@@ -548,13 +551,13 @@ def move(piece):
                     playerPiece = piece
                     botPiece = oppPiece
                 if botPiece.idx == 0:
-                    setupFight(300, 'Du wurdest von Herr Lenz-Faktenverweigerer angegriffen', 'ThisCharmingMan8Bit', 'LenzFaktenverweigererSprite', False, True, False, False, False) #glof
+                    setupFight(300, 'Du wurdest von Herr Lenz-Faktenverweigerer angegriffen', 'ThisCharmingMan8Bit', 'LenzFaktenverweigererSprite', False, True, False, False, False, 249, 623) #glof
                 if botPiece.idx == 1:
-                    setupFight(400, 'Du wurdest von Friedrich Schmerz angegriffen', 'ImTheOne8Bit', 'FriedrichSchmerzSprite', False, False, False, True, False)
+                    setupFight(400, 'Du wurdest von Friedrich Schmerz angegriffen', 'ImTheOne8Bit', 'FriedrichSchmerzSprite', False, False, False, True, False, 408, 612)
                 if botPiece.idx == 2:
-                    setupFight(400, 'Du wurdest von Georgbär angegriffen', 'RUMine8Bit', 'GeorgbaerSprite', True, False, False, False, False)
+                    setupFight(400, 'Du wurdest von Georgbär angegriffen', 'RUMine8Bit', 'GeorgbaerSprite', True, False, False, False, False, 520, 889)
                 if botPiece.idx == 3:
-                    setupFight(300, 'Du wurdest von Oleg, Fassan und Ayale angegriffen', 'RickRoll8Bit', 'OlegFassanAyaleSprite', False, False, True, False, False)
+                    setupFight(300, 'Du wurdest von Oleg, Fassan und Ayale angegriffen', 'RickRoll8Bit', 'OlegFassanAyaleSprite', False, False, True, False, False, 643, 890)
                 fightActive = True
                 break
     
@@ -603,9 +606,11 @@ for i in range(len(dice_frames)):
     dice_frames[i] = pygame.transform.scale(dice_frames[i], (120, 120))  # Optional skalieren
 isRolling = False
 diceFrameIndex = 0
-diceRollDelay = 2  # Anzahl Frames, die ein Bild angezeigt wird
+diceRollDelay = 1  # Anzahl Frames, die ein Bild angezeigt wird
 diceRollCounter = 0
 moveComplete = True
+fightActive = True
+setupFight(300, 'Du wurdest von Herr Lenz-Faktenverweigerer angegriffen', 'ThisCharmingMan8Bit', 'LenzFaktenverweigererSprite', False, True, False, False, False, 249, 623) #glof
 dice = 0
 movesInARow = 0
 current_player = players[currentPlayerIdx]
