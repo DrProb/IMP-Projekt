@@ -88,7 +88,7 @@ square = [
 ]
 
 def setupFight(startHp, givenMessage, music, enemySprite, georg, lenz, olfaay, friedrich, isLinus, width, height):
-    global playerFight, message, enemy_image, enemy, barrier_active0, barrier_timer0, barrier_active1, barrier_timer1, barrier_active2, barrier_timer2, barrier_active3, barrier_timer3, health_active, health_timer, FP_active, FP_timer, enemy_attack_image_active, enemy_attack_image_pos, enemy_attack_image_speed, use_special, flasche_active, flasche_speed, attack_image_active2, attack_image_pos2, attack_image_speed2, pending_attack_damage2, attack_image_active1, attack_image_pos1, attack_image_speed1, pending_attack_damage1, attack_image_active, attack_image_pos, attack_image_speed, pending_attack_damage, selected_index, pending_enemy_damage, game_over, block_mode, marker_x, marker_speed, block_result, player_turn, menu_open, menu_type, next_loud_timer, georgbaerSpecial, lenzFaktenVerweigererSpecial, olFaAySpecial, friedrichSchmerzSpecial, linus
+    global playerFight, message, enemy_image, enemy, barrier_active0, barrier_timer0, barrier_active1, barrier_timer1, barrier_active2, barrier_timer2, barrier_active3, barrier_timer3, health_active, health_timer, FP_active, FP_timer, enemy_attack_image_active, enemy_attack_image_pos, enemy_attack_image_speed, use_special, flasche_active, flasche_speed, attack_image_active2, attack_image_pos2, attack_image_speed2, pending_attack_damage2, attack_image_active1, attack_image_pos1, attack_image_speed1, pending_attack_damage1, attack_image_active, attack_image_pos, attack_image_speed, pending_attack_damage, selected_index, pending_enemy_damage, game_over, block_mode, marker_x, marker_speed, block_result, player_turn, menu_open, menu_type, next_loud_timer, georgbaerSpecial, lenzFaktenVerweigererSpecial, olFaAySpecial, friedrichSchmerzSpecial, linus, background, healthInfoEnemyX, healthInfoEnemyY
     georgbaerSpecial = georg
     lenzFaktenVerweigererSpecial = lenz
     olFaAySpecial = olfaay
@@ -96,7 +96,7 @@ def setupFight(startHp, givenMessage, music, enemySprite, georg, lenz, olfaay, f
     linus = isLinus
     enemy = {
     "hp": startHp,
-    "rect": pygame.Rect(1880-width, 540-height//2, height, height)
+    "rect": pygame.Rect(1640-width, 570-height//2, height, height)
     }
     message = givenMessage
     pygame.mixer.music.load(f'sounds/{music}.mp3')
@@ -106,8 +106,10 @@ def setupFight(startHp, givenMessage, music, enemySprite, georg, lenz, olfaay, f
     "hp": 100,
     "fp": 10,
     "items": {"hp": 2, "fp": 2},
-    "rect": pygame.Rect(100, 200, 612, 612)
+    "rect": pygame.Rect(272, 264, 612, 612)
     }
+    healthInfoEnemyX = 1640-width+width//2-120
+    healthInfoEnemyY = 570-height//2-91
     barrier_active0 = False
     barrier_timer0 = 0
     barrier_active1 = False
@@ -123,7 +125,7 @@ def setupFight(startHp, givenMessage, music, enemySprite, georg, lenz, olfaay, f
     enemy_attack_image_active = False
     enemy_attack_image_pos = [0, 0]
     enemy_attack_image_speed = 12
-
+    background = pygame.image.load("pictures/fight/fightBackground.png")
     use_special = False
     flasche_active = False
     flasche_speed = 3
@@ -153,7 +155,10 @@ def setupFight(startHp, givenMessage, music, enemySprite, georg, lenz, olfaay, f
     menu_type = None
     next_loud_timer = pygame.time.get_ticks() + random.randint(15000, 25000) 
 
-
+healthInfoPlayer = pygame.image.load("pictures/fight/healthInfoPlayer.png").convert_alpha()
+healthInfoPlayer = pygame.transform.scale(healthInfoPlayer, (240, 132))
+healthInfoEnemy = pygame.image.load("pictures/fight/healthInfoEnemy.png").convert_alpha()
+healthInfoEnemy = pygame.transform.scale(healthInfoEnemy, (240, 91))
 
 # Background Music
 #pygame.mixer.music.load('sounds/TakeTheTime8Bit.mp3')
@@ -165,6 +170,8 @@ next_loud_timer = pygame.time.get_ticks() + random.randint(15000, 25000)  # 15-2
 
 # Font and Clock
 font = pygame.font.SysFont(None, 30)
+pointInfoPlayerFont = pygame.font.SysFont(None, 60)
+pointInfoEnemyFont = pygame.font.SysFont(None, 50)
 clock = pygame.time.Clock()
 
 # Colors
@@ -245,6 +252,8 @@ flasche_active = False
 flasche_speed = 3
 
 #enemy attack
+healthInfoEnemyX = 0
+healthInfoEnemyY = 0 
 
 enemy_attack_image = pygame.image.load("pictures/fight/Enemy Flame.png").convert_alpha()
 enemy_attack_image_active = False
@@ -254,13 +263,15 @@ enemy_attack_image_speed = 12
 use_special = False
 gameOver = False
 
-def draw_text(text, x, y):
-    screen.blit(font.render(text, True, WHITE), (x, y))
+def draw_text(text, x, y, schriftart):
+    text_surface = schriftart.render(text, True, WHITE)
+    text_rect = text_surface.get_rect(center=(x, y))
+    screen.blit(text_surface, text_rect)
 
 def draw_bars():
-    draw_text(f"Player HP: {playerFight['hp']}", 10, 10)
-    draw_text(f"FP: {playerFight['fp']}", 10, 40)
-    draw_text(f"Enemy HP: {enemy['hp']}", WIDTH - 200, 10)
+    draw_text(f"{playerFight['hp']}", 476, 188, pointInfoPlayerFont)
+    draw_text(f"{playerFight['fp']}", 476, 247, pointInfoPlayerFont)
+    draw_text(f"{enemy['hp']}", healthInfoEnemyX+120, 224, pointInfoEnemyFont)
 
 def draw_menu(options, selected_index):
     for i, option in enumerate(options):
@@ -555,9 +566,9 @@ def move(piece):
                 if botPiece.idx == 1:
                     setupFight(400, 'Du wurdest von Friedrich Schmerz angegriffen', 'ImTheOne8Bit', 'FriedrichSchmerzSprite', False, False, False, True, False, 408, 612)
                 if botPiece.idx == 2:
-                    setupFight(400, 'Du wurdest von Georgbär angegriffen', 'RUMine8Bit', 'GeorgbaerSprite', True, False, False, False, False, 520, 889)
+                    setupFight(400, 'Du wurdest von Georgbär angegriffen', 'RUMine8Bit', 'GeorgbaerSprite', True, False, False, False, False, 358, 612)
                 if botPiece.idx == 3:
-                    setupFight(300, 'Du wurdest von Oleg, Fassan und Ayale angegriffen', 'RickRoll8Bit', 'OlegFassanAyaleSprite', False, False, True, False, False, 643, 890)
+                    setupFight(300, 'Du wurdest von Oleg, Fassan und Ayale angegriffen', 'RickRoll8Bit', 'olfaay3', False, False, True, False, False, 692, 612)
                 fightActive = True
                 break
     
@@ -609,8 +620,8 @@ diceFrameIndex = 0
 diceRollDelay = 1  # Anzahl Frames, die ein Bild angezeigt wird
 diceRollCounter = 0
 moveComplete = True
-#fightActive = True
-#setupFight(500, 'Du wurdest von Linus Torvalds angegriffen', 'TakeTheTime8Bit', 'LinusTorvaldsSprite', True, True, True, True, True, 408, 612)
+fightActive = True
+setupFight(300, 'Du wurdest von Oleg, Fassan und Ayale angegriffen', 'RickRoll8Bit', 'olfaay3', False, False, True, False, False, 692, 612)
 dice = 0
 movesInARow = 0
 current_player = players[currentPlayerIdx]
@@ -727,10 +738,17 @@ while running:
     #running = True
     #while running:
         #print("Fight started:")
-        screen.fill(BLACK)
+        
+        #pygame.display.flip()
 
         current_time = pygame.time.get_ticks()
-
+        clock.tick(60)
+        window_size = screen.get_size()
+        losingScreen_scaled, bg_pos = get_scaled_background(window_size)
+        screen.fill((0, 0, 0))
+        screen.blit(losingScreen_scaled, bg_pos)
+        screen.blit(healthInfoPlayer, (356, 148))
+        screen.blit(healthInfoEnemy, (healthInfoEnemyX, healthInfoEnemyY))
         if georgbaerSpecial:
             if current_time >= next_loud_timer: #Georgsyndrom
                 loud_sound.play()
@@ -918,7 +936,7 @@ while running:
             if marker_x > 530 or marker_x < 100:
                 marker_speed *= -1
 
-        draw_text(message, 10, HEIGHT - 30)
+        draw_text(message, 10, HEIGHT - 30, font)
 
         if attack_image_active:
         # Target is the center of the enemy
@@ -1049,7 +1067,7 @@ while running:
             fightActive = False
 
         pygame.display.flip()
-        clock.tick(60)
+        #clock.tick(60)
     
     if gameOver:
         clock.tick(60)
