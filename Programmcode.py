@@ -96,7 +96,7 @@ def setupFight(startHp, givenMessage, music, enemySprite, georg, lenz, olfaay, f
     linus = isLinus
     enemy = {
     "hp": startHp,
-    "rect": pygame.Rect(1920-width*1.4, 215, height, height)
+    "rect": pygame.Rect(1880-width, 540-height//2, height, height)
     }
     message = givenMessage
     pygame.mixer.music.load(f'sounds/{music}.mp3')
@@ -580,7 +580,7 @@ def move(piece):
             friedrich = abilities[1]
             georg = abilities[2]
             olfaay = abilities[3]
-            setupFight(500, 'Du wurdest von Linus Torvalds angegriffen', 'TakeTheTime8Bit', 'LinusTorvaldsSprite', georg, lenz, olfaay, friedrich, True)
+            setupFight(500, 'Du wurdest von Linus Torvalds angegriffen', 'TakeTheTime8Bit', 'LinusTorvaldsSprite', georg, lenz, olfaay, friedrich, True, 408, 612)
             fightActive = True
         else:
             gameOver = True
@@ -609,8 +609,8 @@ diceFrameIndex = 0
 diceRollDelay = 1  # Anzahl Frames, die ein Bild angezeigt wird
 diceRollCounter = 0
 moveComplete = True
-fightActive = True
-setupFight(300, 'Du wurdest von Herr Lenz-Faktenverweigerer angegriffen', 'ThisCharmingMan8Bit', 'LenzFaktenverweigererSprite', False, True, False, False, False, 249, 623) #glof
+#fightActive = True
+#setupFight(500, 'Du wurdest von Linus Torvalds angegriffen', 'TakeTheTime8Bit', 'LinusTorvaldsSprite', True, True, True, True, True, 408, 612)
 dice = 0
 movesInARow = 0
 current_player = players[currentPlayerIdx]
