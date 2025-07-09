@@ -1,2 +1,21 @@
 # IMP-PROJEKT-LEO-PAUL-DARRAGH--vllt.-AARON-
 IMP Projekt am ende des Jahres
+
+Beschreibung: 
+Bei unserem Spiel handelt es sich um im Prinzip um "Mensch Ärgere Dich Nicht", allerdings haben wir das spiel insofern verändert, dass sobald man eine Figur schlägt, ein Kampf ausgelöst wird, welcher solchen aus spielen wie "Final Fantasy" oder "Expedition 33" ähnelt. Bei diesen Kämpfen hat man drei verschiedene Angriffe, einen normalen Angriff, welcher keinen der "FP" genannten ressourcen verbraucht und entsprechend wenig Schaden verursacht, einen schweren Angriff, der 1 FP verbraucht und stärker ist und einen Spezialangriff, der am meisten Schaden verursacht, aber entsprechend 3 FP verbraucht. Sobald man vom Gegner angegriffen wird, hat man die Möglichkeit, diesen Angriff abzuwehren, was mithilfe von gutem Timing erfolgt, indem man einen sich bewegenden roten Balken zum richtigen Zeitpunkt stoppen muss. Je nachdem, wie gut dies gelingt wird unterschiedlich viel Schaden abgewehrt. Die Story des Spiels lautet wie Folgt: Eines Tages wurde das Königreich von Linus Torvalds heimgesucht und verfiel dessen unheil. Die Bewohner des Köingreichs wurden von Linus gefangen genommen und zu seinen Untertanan gemacht. Unter ihnen sind Herr Lenz-Faktenverweigerer, ein einstiger Gelehrter, der nun alles nicht seinem Weltbild entsprechende gekonnt leugnet, Georgbär, früher ein Friedlicher bewohner der Wälder, der nun agressiv mit schweren Flaschen nach fremden wirft, Friedrich Schmerz, ein ehemaliger Politiker, der nun bei allen angehörigen der Opposition, aber auch bei allen anderen Feinden starke Schmerzen verursacht, und die drei Weisen Oleg, Fassan und Ayale, die nun jegliche Feinde des Linus Torvalds mit deren eigenen Mitteln in die Knie zwingen. Nur noch der Krieger Aaron ist mithilfe der Magie, die er bei seinen Reisen nach Tibet und seinem langjährigen Training bei DanPost, dem stärksten gelehrten des Landes lernte in der Lage, die Untertanen Torvalds' so wie ihn selbst zu besiegen und Frieden zurück ins Land zu bringen.
+Besagter Aaron setzt sich durch uns, die 3 entwickler dieses Spiels zusammen. Der Nahme in Ehren unseres Freundes Aaron, der leider nicht am Projekt teilnehmen konnte, Das Schalke-Trikot in Anlehnung an Leos liebe für besagten Verein, die Gitarre und das Gesicht in Anlehnung an Pauls verehrung des Gitarristen Eddie Van Halen und die Vodkaflasche in Anlehnung an Darraghs unkontrollierbaren Alkoholismus (das ist ein Witz) sowie der Gesichtsausdruck in Anlehnung an Darraghs Wut (das leider nicht).
+
+Teammitglieder:
+Wie bereits Gesagt waren an diesem Projekt Leo Scheller, Darragh Käßer und Paul Herweh beteiligt. Ersterer übernahm die Aufgabe des Mensch-Ärgere-Dich-nicht Teils des Spiels, sowie die Intergration der Folgenden Bereiche in seinen Code, welcher leztenendes das Fertige Produkt wurde, und lezte "Aufräumarbeiten" in Spiel und Code. Paul Schrieb den Code für die Kämpfe und die verschiedenen Alleinstellungsmerkmale dieser. Darragh war für die Animationen in den Kämpfen des Spiels zustaändig so wie, zusammen mit Paul, dem Beheben der Bugs in besagten Kämpfen zuständig.
+
+Setup-anleitung:
+1. installieren sie Visual Studio Code, Git und Python (https://code.visualstudio.com/; https://www.python.org/downloads/; https://git-scm.com/downloads)
+2. Installieren sie Pygame, indem sie Visual Studio Code öffnen und im Terminal "pip install pygame" eingeben
+3. Gehen sie auf unser Repository auf GitHub
+4. Kopieren sie den Link des Repositorys
+5. Erstellen sie irgendwo auf ihrem Computer einen neuen Ordner
+6. Rechts-clicken sie in besagtem Ordner, gehen sie auf "Weitere Optionen" und wählen sie "in Git Bash öffnen"
+7. Schreiben sie in Git Bash folgenden Befehl "git clone -b [name des Branches, den sie haben wollen] [Link zum Repository]"
+8. Suchen sie in den Dateien, die sich nun in besagtem ordner befinden, die .py-Datei
+9. Geben sie im Terminal in Visual Studio Code den Befehl "python [name der Datei].py" ein
+
