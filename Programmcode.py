@@ -147,7 +147,7 @@ def setupFight(startHp, givenMessage, music, enemySprite, georg, lenz, olfaay, f
     game_over = False
 
     block_mode = False
-    marker_x = 100
+    marker_x = 740
     marker_speed = 6
     block_result = None
     player_turn = True
@@ -159,6 +159,10 @@ healthInfoPlayer = pygame.image.load("pictures/fight/healthInfoPlayer.png").conv
 healthInfoPlayer = pygame.transform.scale(healthInfoPlayer, (240, 132))
 healthInfoEnemy = pygame.image.load("pictures/fight/healthInfoEnemy.png").convert_alpha()
 healthInfoEnemy = pygame.transform.scale(healthInfoEnemy, (240, 91))
+dodgingDesign = pygame.image.load("pictures/fight/dodgingDesign.png").convert_alpha()
+dodgingDesign = pygame.transform.scale(dodgingDesign, (500, 90))
+messageDesign = pygame.image.load("pictures/fight/messageDesign.png").convert_alpha()
+messageDesign = pygame.transform.scale(dodgingDesign, (800, 110))
 
 # Background Music
 #pygame.mixer.music.load('sounds/TakeTheTime8Bit.mp3')
@@ -209,7 +213,7 @@ message = "Du wurdest von Linus Torvalds angegriffen"
 game_over = False
 
 block_mode = False
-marker_x = 100
+marker_x = 740
 marker_speed = 6
 block_result = None
 
@@ -280,9 +284,10 @@ def draw_menu(options, selected_index):
         screen.blit(text, (50, 300 + i * 30))
 
 def draw_block_bar():
-    pygame.draw.rect(screen, WHITE, (100, 400, 440, 10))
-    pygame.draw.rect(screen, RED, (310, 395, 20, 20))
-    pygame.draw.rect(screen, GREEN, (marker_x, 395, 10, 20))
+    pygame.draw.rect(screen, WHITE, (740, 570+400, 440, 10))
+    pygame.draw.rect(screen, RED, (960, 570+395, 20, 20))
+    pygame.draw.rect(screen, GREEN, (marker_x, 570+395, 10, 20))
+    #screen.blit(dodgingDesign, (720, 100))
 
 barrier_image0 = pygame.image.load("pictures/fight/Broken Barrier.png").convert_alpha()  
 barrier_rect0 = barrier_image0.get_rect()
@@ -316,7 +321,7 @@ FP_timer = 0
 
 def handle_block(dmg):
     global message
-    center = 320
+    center = 960
     distance = abs(marker_x - center)
     if distance < 10:
         blocked = dmg
@@ -607,7 +612,7 @@ def move(piece):
         #print(moveComplete)
 
 
-                
+               
 running = True
 playerPiece = None
 botPiece = None
@@ -621,8 +626,7 @@ diceRollDelay = 1  # Anzahl Frames, die ein Bild angezeigt wird
 diceRollCounter = 0
 moveComplete = True
 fightActive = True
-setupFight(300, 'Du wurdest von Oleg, Fassan und Ayale angegriffen', 'RickRoll8Bit', 'olfaay3', False, False, True, False, False, 692, 612)
-dice = 0
+setupFight(300, 'Du wurdest von Herr Lenz-Faktenverweigerer angegriffen', 'ThisCharmingMan8Bit', 'LenzFaktenverweigererSprite', False, True, False, False, False, 249, 623) #glof
 movesInARow = 0
 current_player = players[currentPlayerIdx]
 
@@ -749,6 +753,8 @@ while running:
         screen.blit(losingScreen_scaled, bg_pos)
         screen.blit(healthInfoPlayer, (356, 148))
         screen.blit(healthInfoEnemy, (healthInfoEnemyX, healthInfoEnemyY))
+        screen.blit(messageDesign, (1000, 300))
+        
         if georgbaerSpecial:
             if current_time >= next_loud_timer: #Georgsyndrom
                 loud_sound.play()
@@ -861,7 +867,7 @@ while running:
                     pending_enemy_damage = normal_attack()
                     message = "Enemy used Normal Attack! Press SPACE to block!"
                 block_mode = True
-                marker_x = 100
+                marker_x = 740
 
             elif block_mode and event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
@@ -933,10 +939,10 @@ while running:
             enemy_attack_image_active = True
             # Start the projectile at the enemy's right
             enemy_attack_image_pos = [enemy['rect'].left, enemy['rect'].centery]
-            if marker_x > 530 or marker_x < 100:
+            if marker_x > 1170 or marker_x < 740:
                 marker_speed *= -1
 
-        draw_text(message, 10, HEIGHT - 30, font)
+        draw_text(message, 1000, 200, font)
 
         if attack_image_active:
         # Target is the center of the enemy
@@ -953,7 +959,7 @@ while running:
                 pending_attack_damage = 0
                 player_turn = False
                 pygame.time.set_timer(pygame.USEREVENT, 1000)
-                message = f"Normal Attack hit for {enemy['hp']} damage!"
+                message = f"Normal Attack hit for {pending_attack_damage} damage!"
             else:
                 # Move image toward the enemy
                 attack_image_pos[0] += attack_image_speed * dx / distance
