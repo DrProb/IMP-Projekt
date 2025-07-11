@@ -772,7 +772,7 @@ def move(piece):
             friedrich = abilities[1]
             georg = abilities[2]
             olfaay = abilities[3]
-            setupFight(500, 'Du wurdest von Linus Torvalds angegriffen', 'TakeTheTime8Bit', 'LinusTorvaldsSprite', georg, lenz, olfaay, friedrich, True, 408, 612, 150)
+            setupFight(500, 'Du wurdest von Linus Torvalds angegriffen', 'TakeTheTime8Bit', 'LinusTorvaldsSprite', georg, lenz, olfaay, friedrich, True, 408, 612, 180)
             fightActive = True
         else:
             gameOver = True
@@ -1262,7 +1262,7 @@ while running:
                 for i in range(2):
                     for j in range (4):
                         players[i].pieces[j].currentSquare = None
-                background = pygame.image.load("pictures/LosingScreen.png")
+                background = pygame.image.load("pictures/LosingScreen.jpg")
         elif enemy['hp'] <= 0:
             message = "You won!"
             
@@ -1273,12 +1273,13 @@ while running:
                         botPlayer = player
                 endMove(botPiece, botPlayer)
                 fightActive = False
+                background = pygame.image.load("pictures/LudoBackground3.png")
             else:
                 gameOver = True
                 for i in range(2):
                     for j in range (4):
                         players[i].pieces[j].currentSquare = None
-                background = pygame.image.load("pictures/WinningScreen.png")
+                background = pygame.image.load("pictures/WinningScreen.jpg")
 
 
         pygame.display.flip()
