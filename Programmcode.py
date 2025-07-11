@@ -815,8 +815,8 @@ diceFrameIndex = 0
 diceRollDelay = 1  # Anzahl Frames, die ein Bild angezeigt wird
 diceRollCounter = 0
 moveComplete = True
-fightActive = True
-setupFight(**get_enemy_from_db(1)) #glof
+#fightActive = True
+#setupFight(**get_enemy_from_db(1)) #glof
 #setupFight(500, 'Du wurdest von Linus Torvalds angegriffen', 'TakeTheTime8Bit', 'LinusTorvaldsSprite', True, False, True, True, True, 408, 612)
 
 dice = 0
