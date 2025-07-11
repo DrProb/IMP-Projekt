@@ -86,14 +86,20 @@ square = [
 (1050, 490),
 (995, 490)
 ]
+enemyWidth = 0
+enemyHeight = 0
+dodgingThreshold = 0
 
-def setupFight(startHp, givenMessage, music, enemySprite, georg, lenz, olfaay, friedrich, isLinus, width, height):
-    global playerFight, message, enemy_image, enemy, barrier_active0, barrier_timer0, barrier_active1, barrier_timer1, barrier_active2, barrier_timer2, barrier_active3, barrier_timer3, health_active, health_timer, FP_active, FP_timer, enemy_attack_image_active, enemy_attack_image_pos, enemy_attack_image_speed, use_special, flasche_active, flasche_speed, attack_image_active2, attack_image_pos2, attack_image_speed2, pending_attack_damage2, attack_image_active1, attack_image_pos1, attack_image_speed1, pending_attack_damage1, attack_image_active, attack_image_pos, attack_image_speed, pending_attack_damage, selected_index, pending_enemy_damage, game_over, block_mode, marker_x, marker_speed, block_result, player_turn, menu_open, menu_type, next_loud_timer, georgbaerSpecial, lenzFaktenVerweigererSpecial, olFaAySpecial, friedrichSchmerzSpecial, linus, background, healthInfoEnemyX, healthInfoEnemyY
+def setupFight(startHp, givenMessage, music, enemySprite, georg, lenz, olfaay, friedrich, isLinus, width, height, dodgthre):
+    global playerFight, message, enemy_image, enemy, barrier_active0, barrier_timer0, barrier_active1, barrier_timer1, barrier_active2, barrier_timer2, barrier_active3, barrier_timer3, health_active, health_timer, FP_active, FP_timer, enemy_attack_image_active, enemy_attack_image_pos, enemy_attack_image_speed, use_special, flasche_active, flasche_speed, attack_image_active2, attack_image_pos2, attack_image_speed2, pending_attack_damage2, attack_image_active1, attack_image_pos1, attack_image_speed1, pending_attack_damage1, attack_image_active, attack_image_pos, attack_image_speed, pending_attack_damage, selected_index, pending_enemy_damage, game_over, block_mode, marker_x, marker_speed, block_result, player_turn, menu_open, menu_type, next_loud_timer, georgbaerSpecial, lenzFaktenVerweigererSpecial, olFaAySpecial, friedrichSchmerzSpecial, linus, background, healthInfoEnemyX, healthInfoEnemyY, enemyWidth, enemyHeight, dodgingThreshold
+    dodgingThreshold = dodgthre
     georgbaerSpecial = georg
     lenzFaktenVerweigererSpecial = lenz
     olFaAySpecial = olfaay
     friedrichSchmerzSpecial = friedrich
     linus = isLinus
+    enemyWidth = width
+    enemyHeight = height
     enemy = {
     "hp": startHp,
     "rect": pygame.Rect(1640-width, 570-height//2, height, height)
@@ -266,7 +272,7 @@ attack_image_speed2 = 12
 pending_attack_damage2 = 0
 
 flasche_image = pygame.transform.scale(pygame.image.load("pictures/fight/Flasche.png").convert_alpha(), (150, 150))
-flasche_rect = flasche_image.get_rect(topleft=(376, 0))
+flasche_rect = flasche_image.get_rect(topleft=(386, 0))
 flasche_active = False
 flasche_speed = 3
 
@@ -337,7 +343,7 @@ FP_timer = 0
 
 def handle_block(dmg):
     global message
-    center = 960
+    center = 955
     distance = abs(marker_x - center)
     if distance < 10:
         blocked = dmg
@@ -583,13 +589,13 @@ def move(piece):
                     playerPiece = piece
                     botPiece = oppPiece
                 if botPiece.idx == 0:
-                    setupFight(300, 'Du wurdest von Herr Lenz-Faktenverweigerer angegriffen', 'ThisCharmingMan8Bit', 'LenzFaktenverweigererSprite', False, True, False, False, False, 249, 623) #glof
+                    setupFight(300, 'Du wurdest von Herr Lenz-Faktenverweigerer angegriffen', 'ThisCharmingMan8Bit', 'LenzFaktenverweigererSprite', False, True, False, False, False, 249, 623, 228) #glof
                 if botPiece.idx == 1:
-                    setupFight(400, 'Du wurdest von Friedrich Schmerz angegriffen', 'ImTheOne8Bit', 'FriedrichSchmerzSprite', False, False, False, True, False, 408, 612)
+                    setupFight(400, 'Du wurdest von Friedrich Schmerz angegriffen', 'ImTheOne8Bit', 'FriedrichSchmerzSprite', False, False, False, True, False, 408, 612, 150)
                 if botPiece.idx == 2:
-                    setupFight(400, 'Du wurdest von Georgbär angegriffen', 'RUMine8Bit', 'GeorgbaerSprite', True, False, False, False, False, 358, 612)
+                    setupFight(400, 'Du wurdest von Georgbär angegriffen', 'RUMine8Bit', 'GeorgbaerSprite', True, False, False, False, False, 358, 612, 175)
                 if botPiece.idx == 3:
-                    setupFight(300, 'Du wurdest von Oleg, Fassan und Ayale angegriffen', 'RickRoll8Bit', 'olfaay3', False, False, True, False, False, 692, 612)
+                    setupFight(300, 'Du wurdest von Oleg, Fassan und Ayale angegriffen', 'RickRoll8Bit', 'olfaay3', False, False, True, False, False, 692, 612, 50)
                 fightActive = True
                 break
     
@@ -612,7 +618,7 @@ def move(piece):
             friedrich = abilities[1]
             georg = abilities[2]
             olfaay = abilities[3]
-            setupFight(500, 'Du wurdest von Linus Torvalds angegriffen', 'TakeTheTime8Bit', 'LinusTorvaldsSprite', georg, lenz, olfaay, friedrich, True, 408, 612)
+            setupFight(500, 'Du wurdest von Linus Torvalds angegriffen', 'TakeTheTime8Bit', 'LinusTorvaldsSprite', georg, lenz, olfaay, friedrich, True, 408, 612, 150)
             fightActive = True
         else:
             gameOver = True
@@ -642,7 +648,10 @@ diceRollDelay = 1  # Anzahl Frames, die ein Bild angezeigt wird
 diceRollCounter = 0
 moveComplete = True
 fightActive = True
-setupFight(400, 'Du wurdest von Georgbär angegriffen', 'RUMine8Bit', 'GeorgbaerSprite', True, False, False, False, False, 358, 612)
+setupFight(300, 'Du wurdest von Oleg, Fassan und Ayale angegriffen', 'RickRoll8Bit', 'olfaay3', False, False, True, False, False, 692, 612, 50)
+#setupFight(500, 'Du wurdest von Linus Torvalds angegriffen', 'TakeTheTime8Bit', 'LinusTorvaldsSprite', True, False, True, True, True, 408, 612)
+
+dice = 0
 movesInARow = 0
 current_player = players[currentPlayerIdx]
 
@@ -778,7 +787,7 @@ while running:
                 message = "Georgsyndrom. 10 schaden."
                 next_loud_timer = current_time + random.randint(15000, 25000)
                 flasche_active = True
-                flasche_rect.topleft = (376, 0) #georgsyndrom ende
+                flasche_rect.topleft = (386, 0) #georgsyndrom ende
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -970,7 +979,7 @@ while running:
             dy = target_y - attack_image_pos[1]
             distance = (dx**2 + dy**2)**0.5
 
-            if distance < attack_image_speed:
+            if attack_image_pos[0] > (1640-enemyWidth)+enemyWidth//2-dodgingThreshold:
                 # Damage applied on arrival
                 enemy['hp'] -= pending_attack_damage
                 attack_image_active = False
@@ -996,7 +1005,7 @@ while running:
             dy1 = target_y1 - attack_image_pos1[1] 
             distance1 = (dx1**2 + dy1**2)**0.5
 
-            if distance1 < attack_image_speed1:
+            if attack_image_pos1[0] > (1640-enemyWidth)+enemyWidth//2-dodgingThreshold:
                 # Damage applied on arrival
                 enemy['hp'] -= pending_attack_damage1
                 attack_image_active1 = False
@@ -1020,7 +1029,7 @@ while running:
             dy2 = target_y2 - attack_image_pos2[1] 
             distance2 = (dx2**2 + dy2**2)**0.5
 
-            if distance2 < attack_image_speed2:
+            if attack_image_pos2[0] > (1640-enemyWidth)+enemyWidth//2-dodgingThreshold:
             # Damage applied on arrival
                 enemy['hp'] -= pending_attack_damage2
                 attack_image_active2 = False
