@@ -44,7 +44,7 @@ enemy_traits = [
     (0, 300, 'Du wurdest von Herr Lenz-Faktenverweigerer angegriffen', 'ThisCharmingMan8Bit', 'LenzFaktenverweigererSprite',
      False, True, False, False, False, 249, 623, 228),
 
-    (1, 400, 'Du wurdest von Friedrich Schmerz angegriffen', 'ImTheOne8Bit', 'FriedrichSchmerzSprite', False, False, False, True, False, 408, 612, 150),
+    (1, 400, 'Du wurdest von Friedrich Schmerz angegriffen', 'ImTheOne8Bit', 'FriedrichSchmerzSprite', False, False, False, True, False, 408, 612, 160),
 
     (2, 400, 'Du wurdest von Georgbär angegriffen', 'RUMine8Bit', 'GeorgbaerSprite', True, False, False, False, False, 358, 612, 190),
 
