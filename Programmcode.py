@@ -923,10 +923,10 @@ while running:
                     isRolling = False
                     dice = prepareMove(currentPlayerIdx)
                     #actualPiecesPos = []
-                    for player in players:
-                        actualPiecesPos = []
-                        for piece in player.pieces:
-                            actualPiecesPos.append(piece.currentSquare)
+                    #for player in players:
+                        #actualPiecesPos = []
+                        #for piece in player.pieces:
+                            #actualPiecesPos.append(piece.currentSquare)
                         #print(f"{player.piecesPos} actually at {actualPiecesPos}")
             else:
                 if 0 < dice <= 6:
@@ -1297,7 +1297,7 @@ while running:
                 for i in range(2):
                     for j in range (4):
                         players[i].pieces[j].currentSquare = None
-                background = pygame.image.load("pictures/WinningScreen.png")
+                background = pygame.image.load("pictures/WinnigScreen.png")
                 pygame.mixer.music.stop()
                 pygame.mixer.music.load(f'sounds/Jump8Bit(WinningScreen).mp3')
                 pygame.mixer.music.play(loops=-1)
