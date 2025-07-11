@@ -110,33 +110,46 @@ def setupFight(startHp, givenMessage, music, enemySprite, georg, lenz, olfaay, f
     }
     healthInfoEnemyX = 1640-width+width//2-120
     healthInfoEnemyY = 570-height//2-91
+    
     barrier_active0 = False
     barrier_timer0 = 0
+
     barrier_active1 = False
     barrier_timer1 = 0
+
     barrier_active2 = False
     barrier_timer2 = 0
+
     barrier_active3 = False
     barrier_timer3 = 0
+
     health_active = False
     health_timer = 0
+
     FP_active = False
     FP_timer = 0
+
     enemy_attack_image_active = False
     enemy_attack_image_pos = [0, 0]
     enemy_attack_image_speed = 12
+
     background = pygame.image.load("pictures/fight/fightBackground.png")
+
     use_special = False
+
     flasche_active = False
     flasche_speed = 3
+
     attack_image_active2 = False
     attack_image_pos2 = [0, 0]
     attack_image_speed2 = 12
     pending_attack_damage2 = 0
+
     attack_image_active1 = False
     attack_image_pos1 = [0, 0]
     attack_image_speed1 = 12
     pending_attack_damage1 = 0
+
     attack_image_active = False
     attack_image_pos = [0, 0]
     attack_image_speed = 12
@@ -161,8 +174,10 @@ healthInfoEnemy = pygame.image.load("pictures/fight/healthInfoEnemy.png").conver
 healthInfoEnemy = pygame.transform.scale(healthInfoEnemy, (240, 91))
 dodgingDesign = pygame.image.load("pictures/fight/dodgingDesign.png").convert_alpha()
 dodgingDesign = pygame.transform.scale(dodgingDesign, (500, 90))
-messageDesign = pygame.image.load("pictures/fight/messageDesign.png").convert_alpha()
-messageDesign = pygame.transform.scale(dodgingDesign, (800, 110))
+messageDesign = pygame.image.load("pictures/fight/messageDesign5.png").convert_alpha()
+#messageDesign = pygame.transform.scale(messageDesign, (982, 60))
+menuDesign = pygame.image.load("pictures/fight/menuDesign.png").convert_alpha()
+menuDesign = pygame.transform.scale(menuDesign, (198, 144))
 
 # Background Music
 #pygame.mixer.music.load('sounds/TakeTheTime8Bit.mp3')
@@ -227,7 +242,7 @@ pending_enemy_damage = 0
 # --- Utility Functions ---
 def normal_attack():
     return random.randint(10, 15)
-attack_image = pygame.image.load("pictures/fight/Flame.png").convert_alpha()
+attack_image = pygame.transform.scale(pygame.image.load("pictures/fight/Flame.png").convert_alpha(), (80, 80))
 attack_image_active = False
 attack_image_pos = [0, 0]
 attack_image_speed = 12
@@ -235,7 +250,7 @@ pending_attack_damage = 0
 
 def heavy_attack():
     return random.randint(15, 22)
-attack_image1 = pygame.image.load("pictures/fight/Blue Flame.png").convert_alpha()
+attack_image1 = pygame.transform.scale(pygame.image.load("pictures/fight/Blue Flame.png").convert_alpha(), (110, 110))
 attack_image_active1 = False
 attack_image_pos1 = [0, 0]
 attack_image_speed1 = 12
@@ -244,14 +259,14 @@ pending_attack_damage1 = 0
 
 def special_attack():
         return random.randint(35, 50)
-attack_image2 = pygame.image.load("pictures/fight/Special.png").convert_alpha()
+attack_image2 = pygame.transform.scale(pygame.image.load("pictures/fight/Special.png").convert_alpha(), (130, 130))
 attack_image_active2 = False
 attack_image_pos2 = [0, 0]
 attack_image_speed2 = 12
 pending_attack_damage2 = 0
 
 flasche_image = pygame.transform.scale(pygame.image.load("pictures/fight/Flasche.png").convert_alpha(), (150, 150))
-flasche_rect = flasche_image.get_rect(topleft=(100, 0))
+flasche_rect = flasche_image.get_rect(topleft=(376, 0))
 flasche_active = False
 flasche_speed = 3
 
@@ -259,7 +274,7 @@ flasche_speed = 3
 healthInfoEnemyX = 0
 healthInfoEnemyY = 0 
 
-enemy_attack_image = pygame.image.load("pictures/fight/Enemy Flame.png").convert_alpha()
+enemy_attack_image = pygame.transform.scale(pygame.image.load("pictures/fight/Enemy Flame.png").convert_alpha(), (80, 80))
 enemy_attack_image_active = False
 enemy_attack_image_pos = [0, 0]
 enemy_attack_image_speed = 12
@@ -278,10 +293,11 @@ def draw_bars():
     draw_text(f"{enemy['hp']}", healthInfoEnemyX+120, 224, pointInfoEnemyFont)
 
 def draw_menu(options, selected_index):
+    screen.blit(menuDesign, (858, 890))
     for i, option in enumerate(options):
         color = WHITE if i != selected_index else RED
         text = font.render(option, True, color)
-        screen.blit(text, (50, 300 + i * 30))
+        screen.blit(text, (886, 921 + i * 30))
 
 def draw_block_bar():
     pygame.draw.rect(screen, WHITE, (740, 570+400, 440, 10))
@@ -307,13 +323,13 @@ barrier_timer2 = 0
 barrier_active3 = False
 barrier_timer3 = 0
 
-health_image = pygame.transform.scale(pygame.image.load("pictures/fight/Health.png").convert_alpha(), (50, 50))
+health_image = pygame.transform.scale(pygame.image.load("pictures/fight/Health.png").convert_alpha(), (100, 100))
 health_rect = health_image.get_rect()
 
 health_active = False
 health_timer = 0
 
-FP_image = pygame.transform.scale(pygame.image.load("pictures/fight/FP.png").convert_alpha(), (50, 50))
+FP_image = pygame.transform.scale(pygame.image.load("pictures/fight/FP.png").convert_alpha(), (100, 100))
 FP_rect = FP_image.get_rect()
 
 FP_active = False
@@ -626,7 +642,7 @@ diceRollDelay = 1  # Anzahl Frames, die ein Bild angezeigt wird
 diceRollCounter = 0
 moveComplete = True
 fightActive = True
-setupFight(300, 'Du wurdest von Herr Lenz-Faktenverweigerer angegriffen', 'ThisCharmingMan8Bit', 'LenzFaktenverweigererSprite', False, True, False, False, False, 249, 623) #glof
+setupFight(400, 'Du wurdest von Georgbär angegriffen', 'RUMine8Bit', 'GeorgbaerSprite', True, False, False, False, False, 358, 612)
 movesInARow = 0
 current_player = players[currentPlayerIdx]
 
@@ -753,7 +769,7 @@ while running:
         screen.blit(losingScreen_scaled, bg_pos)
         screen.blit(healthInfoPlayer, (356, 148))
         screen.blit(healthInfoEnemy, (healthInfoEnemyX, healthInfoEnemyY))
-        screen.blit(messageDesign, (1000, 300))
+        screen.blit(messageDesign, (468, 5))
         
         if georgbaerSpecial:
             if current_time >= next_loud_timer: #Georgsyndrom
@@ -762,7 +778,7 @@ while running:
                 message = "Georgsyndrom. 10 schaden."
                 next_loud_timer = current_time + random.randint(15000, 25000)
                 flasche_active = True
-                flasche_rect.topleft = (50, 0) #georgsyndrom ende
+                flasche_rect.topleft = (376, 0) #georgsyndrom ende
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -802,7 +818,7 @@ while running:
                             if selected_index == 0:  # Normal
                                 pending_attack_damage = normal_attack()
                                 # Start the image from just beside the player
-                                attack_image_pos = [playerFight['rect'].right, playerFight['rect'].centery]
+                                attack_image_pos = [playerFight['rect'].centery, playerFight['rect'].centery]
                                 attack_image_active = True
                                 menu_open = False
                                 dmg = normal_attack()
@@ -810,7 +826,7 @@ while running:
                                 if playerFight['fp'] >= 1:
                                     pending_attack_damage1 = heavy_attack()
                                     # Start the image from just beside the player
-                                    attack_image_pos1 = [playerFight['rect'].right, playerFight['rect'].centery]
+                                    attack_image_pos1 = [playerFight['rect'].centery, playerFight['rect'].centery]
                                     attack_image_active1 = True
                                     menu_open = False
                                     dmg = heavy_attack()
@@ -822,7 +838,7 @@ while running:
                                 if playerFight['fp'] >= 3:
                                     pending_attack_damage2 = special_attack()
                                     # Start the image from just beside the player
-                                    attack_image_pos2 = [playerFight['rect'].right, playerFight['rect'].centery]
+                                    attack_image_pos2 = [playerFight['rect'].centery, playerFight['rect'].centery]
                                     attack_image_active2 = True
                                     menu_open = False
                                     dmg = special_attack()
@@ -866,6 +882,7 @@ while running:
                 else:
                     pending_enemy_damage = normal_attack()
                     message = "Enemy used Normal Attack! Press SPACE to block!"
+                enemy_attack_image_pos = [enemy['rect'].left, enemy['rect'].centery]    
                 block_mode = True
                 marker_x = 740
 
@@ -914,14 +931,14 @@ while running:
         draw_bars()
 
         if health_active:
-            health_rect.midleft = (playerFight['rect'].right + 5, playerFight['rect'].centery)
+            health_rect.midleft = (700, 500)
             screen.blit(health_image, health_rect)
 
         if health_active and pygame.time.get_ticks() - health_timer > 1000:  # show for 1 second
             health_active = False    
 
         if FP_active:
-            FP_rect.midleft = (playerFight['rect'].right + 5, playerFight['rect'].centery)
+            FP_rect.midleft = (playerFight['rect'].right + 50, playerFight['rect'].centery)
             screen.blit(FP_image, FP_rect)
 
         if FP_active and pygame.time.get_ticks() - FP_timer > 1000:  # show for 1 second
@@ -938,11 +955,12 @@ while running:
             marker_x += marker_speed
             enemy_attack_image_active = True
             # Start the projectile at the enemy's right
+
             enemy_attack_image_pos = [enemy['rect'].left, enemy['rect'].centery]
             if marker_x > 1170 or marker_x < 740:
                 marker_speed *= -1
 
-        draw_text(message, 1000, 200, font)
+        draw_text(message, 960, 36, font)
 
         if attack_image_active:
         # Target is the center of the enemy
@@ -956,10 +974,11 @@ while running:
                 # Damage applied on arrival
                 enemy['hp'] -= pending_attack_damage
                 attack_image_active = False
-                pending_attack_damage = 0
+                
                 player_turn = False
                 pygame.time.set_timer(pygame.USEREVENT, 1000)
                 message = f"Normal Attack hit for {pending_attack_damage} damage!"
+                pending_attack_damage = 0
             else:
                 # Move image toward the enemy
                 attack_image_pos[0] += attack_image_speed * dx / distance
@@ -973,18 +992,19 @@ while running:
         # Target is the center of the enemy
             target_x1, target_y1  = enemy['rect'].center
 
-            dx1 = target_x1 - attack_image_pos1[0] - 40
-            dy1 = target_y1 - attack_image_pos1[1] - 10
+            dx1 = target_x1 - attack_image_pos1[0] 
+            dy1 = target_y1 - attack_image_pos1[1] 
             distance1 = (dx1**2 + dy1**2)**0.5
 
             if distance1 < attack_image_speed1:
                 # Damage applied on arrival
                 enemy['hp'] -= pending_attack_damage1
                 attack_image_active1 = False
-                pending_attack_damage1 = 0
+                
                 player_turn = False
                 pygame.time.set_timer(pygame.USEREVENT, 1000)
-                message = f"Normal Attack hit for {enemy['hp']} damage!"
+                message = f"Heavy Attack hit for {pending_attack_damage1} damage!"
+                pending_attack_damage1 = 0
             else:
                 # Move image toward the enemy
                 attack_image_pos1[0] += attack_image_speed1 * dx1 / distance1
@@ -992,9 +1012,10 @@ while running:
         # Draw the attack image
             attack_rect = attack_image.get_rect(center=(int(attack_image_pos1[0]), int(attack_image_pos1[1])))
             screen.blit(attack_image1, attack_rect)
+
         if attack_image_active2:
         # Target is the center of the enemy
-            target_x2, target_y2 = enemy['rect'].right, enemy['rect'].centery
+            target_x2, target_y2 = enemy['rect'].center
             dx2 = target_x2 - attack_image_pos2[0] 
             dy2 = target_y2 - attack_image_pos2[1] 
             distance2 = (dx2**2 + dy2**2)**0.5
@@ -1003,10 +1024,11 @@ while running:
             # Damage applied on arrival
                 enemy['hp'] -= pending_attack_damage2
                 attack_image_active2 = False
-                pending_attack_damage2 = 0
+                
                 player_turn = False
                 pygame.time.set_timer(pygame.USEREVENT, 1000)
-                message = f"Normal Attack hit for {enemy['hp']} damage!"
+                message = f"Special Attack hit for {pending_attack_damage2} damage!"
+                pending_attack_damage2 = 0
             else:
                 # Move image toward the enemy
                 attack_image_pos2[0] += attack_image_speed2 * dx2 / distance2
@@ -1097,3 +1119,4 @@ sys.exit()
 #6. richtige größe #1
 #7. design #2
 #8. linus fight #0
+#font & symbole statt text im menü
