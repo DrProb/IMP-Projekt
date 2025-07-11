@@ -532,6 +532,14 @@ class Player:
             self.piecesPos = get_piece_positions(0)
         else:
             self.piecesPos = get_piece_positions(1)
+        self.diceImages = []
+        for i in range(1, 7):
+            self.diceImages.append(pygame.image.load(f"pictures/dice/pics/{colors[self.colorIdx]}/dice{i}.png").convert_alpha())
+        self.frames = []
+        for i in range(1, 10):
+            self.frames.append(pygame.image.load(f"pictures/dice/pics/frames/{colors[self.colorIdx]}/frame{i}.png").convert_alpha())
+        for i in range(len(self.frames)):
+            self.frames[i] = pygame.transform.scale(self.frames[i], (120, 120))
         self.colorSquare = []
         self.homeSquares = []
         self.bot = isBot
@@ -902,7 +910,7 @@ while running:
             #if current_player.bot:
         #print(f"diceRolling. {isRolling}")
             if isRolling:
-                screen.blit(dice_frames[diceFrameIndex // diceRollDelay], (WIDTH//2 - 92, HEIGHT//2 - 76))  # zentriert zeichnen
+                screen.blit(current_player.frames[diceFrameIndex // diceRollDelay], (WIDTH//2 - 92, HEIGHT//2 - 76))  # zentriert zeichnen
                 diceRollCounter += 1
                 #print("Still alive")
                 if diceRollCounter >= diceRollDelay:
@@ -921,9 +929,9 @@ while running:
                         #print(f"{player.piecesPos} actually at {actualPiecesPos}")
             else:
                 if 0 < dice <= 6:
-                    dice_image = pygame.image.load(f"pictures/dice/pics/dice{dice}.png").convert_alpha()
+                    dice_image = current_player.diceImages[dice-1]
                 else:
-                    dice_image = pygame.image.load(f"pictures/dice/pics/dice1.png").convert_alpha()
+                    dice_image = current_player.diceImages[0]
                 dice_image = pygame.transform.scale(dice_image, (120, 120))
                 screen.blit(dice_image, (WIDTH//2-92, HEIGHT//2-76))
             current_player = players[currentPlayerIdx]
@@ -1267,7 +1275,7 @@ while running:
                 for i in range(2):
                     for j in range (4):
                         players[i].pieces[j].currentSquare = None
-                background = pygame.image.load("pictures/LosingScreen.jpg")
+                background = pygame.image.load("pictures/LosingScreen.png")
         elif enemy['hp'] <= 0:
             message = "You won!"
             
@@ -1284,7 +1292,7 @@ while running:
                 for i in range(2):
                     for j in range (4):
                         players[i].pieces[j].currentSquare = None
-                background = pygame.image.load("pictures/WinningScreen.jpg")
+                background = pygame.image.load("pictures/WinningScreen.png")
 
 
         pygame.display.flip()
