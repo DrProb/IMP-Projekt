@@ -1,19 +1,96 @@
 import pygame
 import sys
 import random
-import time
+import sqlite3
 
 pygame.init()
 pygame.mixer.init()
+
+connection = sqlite3.connect("game_database.db")
+cursor = connection.cursor()
+
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS enemy_data (
+    idx INTEGER PRIMARY KEY,
+    startHP INTEGER,
+    message TEXT,
+    music TEXT,
+    sprite TEXT,
+    georgAbility BOOLEAN,
+    lenzfaktenAbility BOOLEAN,
+    olfaayAbility BOOLEAN,
+    friedrichSchmerz BOOLEAN,
+    isLinus BOOLEAN,
+    width INTEGER,
+    height INTEGER,
+    dodgingThreshold INTEGER
+)
+''')
+
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS piecesPos (
+    idx INTEGER PRIMARY KEY,
+    piece0 INTEGER,
+    piece1 INTEGER,
+    piece2 INTEGER,
+    piece3 INTEGER
+)
+''')
+
+cursor.execute("SELECT COUNT(*) FROM enemy_data")
+count = cursor.fetchone()[0]
+
+enemy_traits = [
+    (0, 300, 'Du wurdest von Herr Lenz-Faktenverweigerer angegriffen', 'ThisCharmingMan8Bit', 'LenzFaktenverweigererSprite',
+     False, True, False, False, False, 249, 623, 228),
+
+    (1, 400, 'Du wurdest von Friedrich Schmerz angegriffen', 'ImTheOne8Bit', 'FriedrichSchmerzSprite', False, False, False, True, False, 408, 612, 150),
+
+    (2, 400, 'Du wurdest von Georgbär angegriffen', 'RUMine8Bit', 'GeorgbaerSprite', True, False, False, False, False, 358, 612, 190),
+
+    (3, 300, 'Du wurdest von Oleg, Fassan und Ayale angegriffen', 'RickRoll8Bit', 'olfaay3', False, False, True, False, False, 692, 612, 50),
+
+    (4, 500, 'Du wurdest von Linus Torvalds angegriffen', 'TakeTheTime8Bit', 'LinusTorvaldsSprite', None, None, None, None, True, 408, 612, 150)
+]
+
+if count == 0:
+    cursor.executemany('''
+    INSERT INTO enemy_data (
+    idx, startHP, message, music, sprite,
+    georgAbility, lenzfaktenAbility, olfaayAbility,
+    friedrichSchmerz, isLinus, width, height, dodgingThreshold
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', enemy_traits)
+    connection.commit()
+
+cursor.execute("SELECT COUNT(*) FROM piecesPos")
+count = cursor.fetchone()[0]
+
+if count == 0:
+    cursor.execute('''
+    INSERT OR REPLACE INTO piecesPos (idx, piece0, piece1, piece2, piece3)
+    VALUES (?, ?, ?, ?, ?)
+    ''', (0, None, None, None, None))
+    cursor.execute('''
+    INSERT OR REPLACE INTO piecesPos (idx, piece0, piece1, piece2, piece3)
+    VALUES (?, ?, ?, ?, ?)
+    ''', (1, None, None, None, None))
+    connection.commit()
+    print(f"Initialized piecesPos")
+
+connection.close()
+
 
 # Screen setup
 WIDTH, HEIGHT = 1920, 1080
 font = pygame.font.Font(None, 144)
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Joe the Square vs The Corners of Doom")
+pygame.display.set_caption("The Linux Wars")
 square_positions = []
 startingPlayer = 0
 currentPlayerIdx = 0
+won = False
+lost = False
 currentPlayerIdx = startingPlayer
 colors = ["yellow", "green", "blue", "red"]
 square = [
@@ -173,6 +250,82 @@ def setupFight(startHp, givenMessage, music, enemySprite, georg, lenz, olfaay, f
     menu_open = False
     menu_type = None
     next_loud_timer = pygame.time.get_ticks() + random.randint(15000, 25000) 
+
+def get_enemy_from_db(idx):
+    connection = sqlite3.connect("game_database.db")
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT * FROM enemy_data WHERE idx = ?", (idx,))
+    row = cursor.fetchone()
+    connection.close()
+
+    if row is None:
+        raise ValueError(f"Kein Gegner mit idx {idx} gefunden!")
+
+    # row = (idx, startHP, message, music, sprite, georg, lenz, olfaay, friedrich, isLinus, width, height, dodgingThreshold)
+
+    return {
+        "startHp": row[1],
+        "givenMessage": row[2],
+        "music": row[3],
+        "enemySprite": row[4],
+        "georg": bool(row[5]),
+        "lenz": bool(row[6]),
+        "olfaay": bool(row[7]),
+        "friedrich": bool(row[8]),
+        "isLinus": bool(row[9]),
+        "width": row[10],
+        "height": row[11],
+        "dodgthre": row[12]
+    }
+
+def get_piece_positions(idx):
+    connection = sqlite3.connect("game_database.db")
+    cursor = connection.cursor()
+
+    cursor.execute('''
+        SELECT piece0, piece1, piece2, piece3
+        FROM piecesPos
+        WHERE idx = ?
+    ''', (idx,))
+    
+    result = cursor.fetchone()
+    connection.close()
+
+    if result:
+        return list(result)
+    else:
+        return None  # oder [] wenn du lieber leere Liste willst
+    
+def update_piece_positions(idx, positions):
+    connection = sqlite3.connect("game_database.db")
+    cursor = connection.cursor()
+
+    cursor.execute('''
+        UPDATE piecesPos
+        SET piece0 = ?, piece1 = ?, piece2 = ?, piece3 = ?
+        WHERE idx = ?
+    ''', (positions[0], positions[1], positions[2], positions[3], idx))
+
+    connection.commit()
+    connection.close()
+
+def reset_game():
+    global diceRollCounter, moveComplete, isRolling, playerPiece, botPiece, currentPlayerIdx, fightActive, movesInARow
+    for player in players:
+        player.piecesPos = [None] * 4
+        for piece in player.pieces:
+            piece.atHome = True
+            piece.currentSquare = None
+            piece.moveable = False
+    diceRollCounter = 0
+    moveComplete = True
+    isRolling = False
+    playerPiece = None
+    botPiece = None
+    currentPlayerIdx = 0
+    fightActive = False
+    movesInARow = 0
 
 healthInfoPlayer = pygame.image.load("pictures/fight/healthInfoPlayer.png").convert_alpha()
 healthInfoPlayer = pygame.transform.scale(healthInfoPlayer, (240, 132))
@@ -373,7 +526,10 @@ class Player:
     def __init__(self, colorIdx, isBot):
         self.colorIdx = colorIdx
         self.pieces = []
-        self.piecesPos = [None] * 4
+        if not isBot:
+            self.piecesPos = get_piece_positions(0)
+        else:
+            self.piecesPos = get_piece_positions(1)
         self.colorSquare = []
         self.homeSquares = []
         self.bot = isBot
@@ -389,7 +545,7 @@ class Player:
 
     def setup(self):
         for i in range(4):
-            piece = Piece(self.colorIdx, i)
+            piece = Piece(self.colorIdx, i, self.piecesPos[i])
             piece.draw(self.homeSquares[i])
             self.pieces.append(piece)
 
@@ -465,12 +621,15 @@ class Player:
 
 
 class Piece:
-    def __init__(self, colorIdx, pieceIdx):           
+    def __init__(self, colorIdx, pieceIdx, startPos):           
         self.idx = pieceIdx
         self.colorIdx = colorIdx
-        self.currentSquare = None
+        self.currentSquare = startPos
         self.color = colors[colorIdx]
-        self.atHome = True
+        if startPos == None:
+            self.atHome = True
+        else: 
+            self.atHome = False
         self.onBoard = False
         self.rotation = 0
         self.player_image = pygame.image.load(f"pictures/{self.color}.png").convert_alpha()
@@ -588,14 +747,9 @@ def move(piece):
                 else:
                     playerPiece = piece
                     botPiece = oppPiece
-                if botPiece.idx == 0:
-                    setupFight(300, 'Du wurdest von Herr Lenz-Faktenverweigerer angegriffen', 'ThisCharmingMan8Bit', 'LenzFaktenverweigererSprite', False, True, False, False, False, 249, 623, 228) #glof
-                if botPiece.idx == 1:
-                    setupFight(400, 'Du wurdest von Friedrich Schmerz angegriffen', 'ImTheOne8Bit', 'FriedrichSchmerzSprite', False, False, False, True, False, 408, 612, 150)
-                if botPiece.idx == 2:
-                    setupFight(400, 'Du wurdest von Georgbär angegriffen', 'RUMine8Bit', 'GeorgbaerSprite', True, False, False, False, False, 358, 612, 175)
-                if botPiece.idx == 3:
-                    setupFight(300, 'Du wurdest von Oleg, Fassan und Ayale angegriffen', 'RickRoll8Bit', 'olfaay3', False, False, True, False, False, 692, 612, 50)
+                
+                setupFight(**get_enemy_from_db(botPiece.idx)) #glof
+            
                 fightActive = True
                 break
     
@@ -647,8 +801,8 @@ diceFrameIndex = 0
 diceRollDelay = 1  # Anzahl Frames, die ein Bild angezeigt wird
 diceRollCounter = 0
 moveComplete = True
-fightActive = True
-setupFight(300, 'Du wurdest von Oleg, Fassan und Ayale angegriffen', 'RickRoll8Bit', 'olfaay3', False, False, True, False, False, 692, 612, 50)
+#fightActive = True
+#setupFight(**get_enemy_from_db(1)) #glof
 #setupFight(500, 'Du wurdest von Linus Torvalds angegriffen', 'TakeTheTime8Bit', 'LinusTorvaldsSprite', True, False, True, True, True, 408, 612)
 
 dice = 0
@@ -672,6 +826,9 @@ while running:
                         diceRollCounter = 0
                         moveComplete = False
                         dice = random.randint(1,6)
+                    if event.key == pygame.K_r and pygame.key.get_mods() & pygame.KMOD_CTRL:
+                        #print("STRG + R wurde gedrückt")
+                        reset_game()
                 if event.type == pygame.MOUSEBUTTONDOWN and not moveComplete and not current_player.bot and not fightActive:
                     mouse_pos = pygame.mouse.get_pos()
                     if not moveComplete and not fightActive:
@@ -751,6 +908,12 @@ while running:
                 if diceFrameIndex >= len(dice_frames) * diceRollDelay:
                     isRolling = False
                     dice = prepareMove(currentPlayerIdx)
+                    #actualPiecesPos = []
+                    for player in players:
+                        actualPiecesPos = []
+                        for piece in player.pieces:
+                            actualPiecesPos.append(piece.currentSquare)
+                        #print(f"{player.piecesPos} actually at {actualPiecesPos}")
             else:
                 if 0 < dice <= 6:
                     dice_image = pygame.image.load(f"pictures/dice/pics/dice{dice}.png").convert_alpha()
@@ -1085,6 +1248,7 @@ while running:
 
         if playerFight['hp'] <= 0:
             message = "You lost!"
+            
             game_over = True
             if not linus:
                 for player in players:
@@ -1092,17 +1256,30 @@ while running:
                         playerPlayer = player
                 endMove(playerPiece, playerPlayer)
                 fightActive = False
+                background = pygame.image.load("pictures/LudoBackground3.png")
             else:
                 gameOver = True
-                background = pygame.image.load("pictures/losingScreen.png")
+                for i in range(2):
+                    for j in range (4):
+                        players[i].pieces[j].currentSquare = None
+                background = pygame.image.load("pictures/LosingScreen.png")
         elif enemy['hp'] <= 0:
             message = "You won!"
+            
             game_over = True
-            for player in players:
-                if player.bot:
-                    botPlayer = player
-            endMove(botPiece, botPlayer)
-            fightActive = False
+            if not linus:
+                for player in players:
+                    if player.bot:
+                        botPlayer = player
+                endMove(botPiece, botPlayer)
+                fightActive = False
+            else:
+                gameOver = True
+                for i in range(2):
+                    for j in range (4):
+                        players[i].pieces[j].currentSquare = None
+                background = pygame.image.load("pictures/WinningScreen.png")
+
 
         pygame.display.flip()
         #clock.tick(60)
@@ -1118,6 +1295,12 @@ while running:
             screen.blit(losingScreen_scaled, bg_pos)
             pygame.display.flip()
 
+for i in range(2):
+    for j in range(4):
+        players[i].piecesPos[j] = players[i].pieces[j].currentSquare
+    update_piece_positions(i, players[i].piecesPos)
+    #print(f"updated {i} to {players[i].piecesPos}")
+
 pygame.quit()
 sys.exit()
 
@@ -1130,3 +1313,4 @@ sys.exit()
 #7. design #2
 #8. linus fight #0
 #font & symbole statt text im menü
+#game icon
