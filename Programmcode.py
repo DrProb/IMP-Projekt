@@ -346,6 +346,7 @@ menuDesign = pygame.transform.scale(menuDesign, (198, 144))
 
 # Loud Sound Setup 
 loud_sound = pygame.mixer.Sound('sounds/GeorgsyndromFix.mp3')
+schmerz = pygame.mixer.Sound("sounds/OOF.mp3")
 next_loud_timer = pygame.time.get_ticks() + random.randint(15000, 25000)  # 15-25 seconds
 
 # Font and Clock
@@ -814,8 +815,8 @@ diceFrameIndex = 0
 diceRollDelay = 1  # Anzahl Frames, die ein Bild angezeigt wird
 diceRollCounter = 0
 moveComplete = True
-#fightActive = True
-#setupFight(**get_enemy_from_db(1)) #glof
+fightActive = True
+setupFight(**get_enemy_from_db(1)) #glof
 #setupFight(500, 'Du wurdest von Linus Torvalds angegriffen', 'TakeTheTime8Bit', 'LinusTorvaldsSprite', True, False, True, True, True, 408, 612)
 
 dice = 0
@@ -972,6 +973,7 @@ while running:
             if friedrichSchmerzSpecial:
                 if not block_mode and event.type == pygame.KEYDOWN: #friedrich
                     if random.random() < 1:
+                        schmerz.play()
                         playerFight['hp'] -= 1
                         message = "Du leidest an Friedrich Schmerzen" #friedrich
 
