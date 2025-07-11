@@ -76,7 +76,7 @@ if count == 0:
     VALUES (?, ?, ?, ?, ?)
     ''', (1, None, None, None, None))
     connection.commit()
-    print(f"Initialized piecesPos")
+    #print(f"Initialized piecesPos")
 
 connection.close()
 
@@ -776,7 +776,10 @@ def move(piece):
             fightActive = True
         else:
             gameOver = True
-            background = pygame.image.load("pictures/losingScreen.png")
+            for i in range(2):
+                for j in range (4):
+                    players[i].pieces[j].currentSquare = None
+            background = pygame.image.load("pictures/LosingScreen.jpg")
 
     if not fightActive:
         if dice != 6: #and not (current_player.piecesPos == [None, None, None, None] and movesInARow > 3):
