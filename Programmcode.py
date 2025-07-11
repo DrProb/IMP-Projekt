@@ -940,14 +940,15 @@ while running:
         draw_bars()
 
         if health_active:
-            health_rect.midleft = (700, 500)
+            health_rect.midleft = (580, 195) ###ggd
             screen.blit(health_image, health_rect)
 
         if health_active and pygame.time.get_ticks() - health_timer > 1000:  # show for 1 second
             health_active = False    
 
         if FP_active:
-            FP_rect.midleft = (playerFight['rect'].right + 50, playerFight['rect'].centery)
+            #FP_rect.midleft = (playerFight['rect'].right + 50, playerFight['rect'].centery)
+            FP_rect.midleft = (580, 260)
             screen.blit(FP_image, FP_rect)
 
         if FP_active and pygame.time.get_ticks() - FP_timer > 1000:  # show for 1 second
