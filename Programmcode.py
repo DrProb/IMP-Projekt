@@ -8,7 +8,7 @@ pygame.mixer.init()
 
 connection = sqlite3.connect("game_database.db")
 cursor = connection.cursor()
-icon = pygame.image.load("pictures/gameIcon2.png")  # dein Icon muss ein .png sein, am besten 32x32
+icon = pygame.image.load("pictures/gameIcon2.png")  
 pygame.display.set_icon(icon)
 
 cursor.execute('''
@@ -44,7 +44,7 @@ count = cursor.fetchone()[0]
 
 enemy_traits = [
     (0, 300, 'Du wurdest von Herr Lenz-Faktenverweigerer angegriffen', 'ThisCharmingMan8Bit', 'LenzFaktenverweigererSprite',
-     False, True, False, False, False, 249, 623, 228),
+     False, True, False, False, False, 249, 623, 240),
 
     (1, 400, 'Du wurdest von Friedrich Schmerz angegriffen', 'ImTheOne8Bit', 'FriedrichSchmerzSprite', False, False, False, True, False, 408, 612, 160),
 
@@ -264,8 +264,6 @@ def get_enemy_from_db(idx):
     if row is None:
         raise ValueError(f"Kein Gegner mit idx {idx} gefunden!")
 
-    # row = (idx, startHP, message, music, sprite, georg, lenz, olfaay, friedrich, isLinus, width, height, dodgingThreshold)
-
     return {
         "startHp": row[1],
         "givenMessage": row[2],
@@ -297,7 +295,7 @@ def get_piece_positions(idx):
     if result:
         return list(result)
     else:
-        return None  # oder [] wenn du lieber leere Liste willst
+        return None  
     
 def update_piece_positions(idx, positions):
     connection = sqlite3.connect("game_database.db")
@@ -333,9 +331,9 @@ healthInfoPlayer = pygame.image.load("pictures/fight/healthInfoPlayer.png").conv
 healthInfoPlayer = pygame.transform.scale(healthInfoPlayer, (240, 132))
 healthInfoEnemy = pygame.image.load("pictures/fight/healthInfoEnemy.png").convert_alpha()
 healthInfoEnemy = pygame.transform.scale(healthInfoEnemy, (240, 91))
-dodgingDesign = pygame.image.load("pictures/fight/dodgingDesign.png").convert_alpha()
-dodgingDesign = pygame.transform.scale(dodgingDesign, (500, 90))
-messageDesign = pygame.image.load("pictures/fight/messageDesign5.png").convert_alpha()
+#dodgingDesign = pygame.image.load("pictures/fight/dodgingDesign.png").convert_alpha()
+#dodgingDesign = pygame.transform.scale(dodgingDesign, (500, 90))
+messageDesign = pygame.image.load("pictures/fight/messageDesign.png").convert_alpha()
 #messageDesign = pygame.transform.scale(messageDesign, (982, 60))
 menuDesign = pygame.image.load("pictures/fight/menuDesign.png").convert_alpha()
 menuDesign = pygame.transform.scale(menuDesign, (198, 144))
@@ -499,7 +497,7 @@ FP_timer = 0
 
 def handle_block(dmg):
     global message
-    center = 955
+    center = 965
     distance = abs(marker_x - center)
     if distance < 10:
         blocked = dmg
@@ -807,7 +805,7 @@ running = True
 playerPiece = None
 botPiece = None
 fullscreen = False
-dice_frames = [pygame.image.load(f"pictures/dice/pics/frames/frame{i}.png").convert_alpha() for i in range(1, 10)]
+dice_frames = [pygame.image.load(f"pictures/dice/pics/frames/white/frame{i}.png").convert_alpha() for i in range(1, 10)]
 for i in range(len(dice_frames)):
     dice_frames[i] = pygame.transform.scale(dice_frames[i], (120, 120))  # Optional skalieren
 isRolling = False
