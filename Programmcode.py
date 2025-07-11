@@ -958,8 +958,8 @@ while running:
 
             if friedrichSchmerzSpecial:
                 if not block_mode and event.type == pygame.KEYDOWN: #friedrich
-                    if random.random() < 0.25:
-                        playerFight['hp'] -= 2
+                    if random.random() < 1:
+                        playerFight['hp'] -= 1
                         message = "Du leidest an Friedrich Schmerzen" #friedrich
 
             if not game_over and player_turn and not block_mode:
