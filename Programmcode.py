@@ -483,13 +483,15 @@ barrier_timer2 = 0
 barrier_active3 = False
 barrier_timer3 = 0
 
-health_image = pygame.transform.scale(pygame.image.load("pictures/fight/Health.png").convert_alpha(), (100, 100))
+#health_image = pygame.transform.scale(pygame.image.load("pictures/fight/Health.png").convert_alpha(), (100, 100))
+health_image = pygame.transform.scale(pygame.image.load("pictures/fight/hpItem.png").convert_alpha(), (70, 70))
 health_rect = health_image.get_rect()
 
 health_active = False
 health_timer = 0
 
-FP_image = pygame.transform.scale(pygame.image.load("pictures/fight/FP.png").convert_alpha(), (100, 100))
+#FP_image = pygame.transform.scale(pygame.image.load("pictures/fight/FP.png").convert_alpha(), (100, 100))
+FP_image = pygame.transform.scale(pygame.image.load("pictures/fight/fpItem.png").convert_alpha(), (70, 70))
 FP_rect = FP_image.get_rect()
 
 FP_active = False
@@ -1116,7 +1118,7 @@ while running:
         draw_bars()
 
         if health_active:
-            health_rect.midleft = (580, 195) ###ggd
+            health_rect.midleft = (585, 190) ###ggd
             screen.blit(health_image, health_rect)
 
         if health_active and pygame.time.get_ticks() - health_timer > 1000:  # show for 1 second
@@ -1124,7 +1126,7 @@ while running:
 
         if FP_active:
             #FP_rect.midleft = (playerFight['rect'].right + 50, playerFight['rect'].centery)
-            FP_rect.midleft = (580, 260)
+            FP_rect.midleft = (585, 252)
             screen.blit(FP_image, FP_rect)
 
         if FP_active and pygame.time.get_ticks() - FP_timer > 1000:  # show for 1 second
