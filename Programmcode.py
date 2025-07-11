@@ -8,6 +8,8 @@ pygame.mixer.init()
 
 connection = sqlite3.connect("game_database.db")
 cursor = connection.cursor()
+icon = pygame.image.load("pictures/gameIcon2.png")  # dein Icon muss ein .png sein, am besten 32x32
+pygame.display.set_icon(icon)
 
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS enemy_data (
