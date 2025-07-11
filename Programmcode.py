@@ -1278,6 +1278,9 @@ while running:
                     for j in range (4):
                         players[i].pieces[j].currentSquare = None
                 background = pygame.image.load("pictures/LosingScreen.png")
+                pygame.mixer.music.stop()
+                pygame.mixer.music.load(f'sounds/BadEnding(LosingScreen).mp3')
+                pygame.mixer.music.play(loops=-1)
         elif enemy['hp'] <= 0:
             message = "You won!"
             
@@ -1295,6 +1298,9 @@ while running:
                     for j in range (4):
                         players[i].pieces[j].currentSquare = None
                 background = pygame.image.load("pictures/WinningScreen.png")
+                pygame.mixer.music.stop()
+                pygame.mixer.music.load(f'sounds/Jump8Bit(WinningScreen).mp3')
+                pygame.mixer.music.play(loops=-1)
 
 
         pygame.display.flip()
