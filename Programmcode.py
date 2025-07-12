@@ -790,7 +790,7 @@ def move(piece):
             for i in range(2):
                 for j in range (4):
                     players[i].pieces[j].currentSquare = None
-            background = pygame.image.load("pictures/LosingScreen.jpg")
+            background = pygame.image.load("pictures/LosingScreen.png")
 
     if not fightActive:
         if dice != 6: #and not (current_player.piecesPos == [None, None, None, None] and movesInARow > 3):
